@@ -1,0 +1,13 @@
+{
+  "name": "clarity-funnel-tracker",
+  "version": "4.0.0",
+  "description": "Multi-Funnel Tracking System with CSV Import",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 5000 -c-1",
+    "start": "npx http-server -p 5000 -c-1"
+  },
+  "keywords": ["funnel", "tracking", "analytics"],
+  "author": "",
+  "license": "MIT"
+}
