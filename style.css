@@ -1,0 +1,1695 @@
+/* ============================================
+   CSS VARIABLES (zentrale Farben)
+   ============================================ */
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --muted: #777;
+  --formula-bg: #f0f0f0;
+  --sunday-bg: #fff3e0;
+  --header-bg: #333;
+  --border-light: #e0e0e0;
+  --border-dark: #444;
+}
+
+/* ============================================
+   SCROLL-OPTIMIERUNG
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   GRUNDLAYOUT
+   ============================================ */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: Inter, system-ui, Arial, sans-serif;
+  background: var(--bg);
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+#app {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 18px 50px 18px;
+  position: relative;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+/* ============================================
+   HEADER (Titel + Zoom) - STICKY FIX
+   ============================================ */
+#app-header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  left: -18px;
+  right: -18px;
+  background: #fff;
+  z-index: 9999;
+  padding: 8px 0 8px 0;
+  margin: 0;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  width: calc(100% + 36px);
+  box-sizing: border-box;
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 36px 0 0px;
+  box-sizing: border-box;
+  max-width: calc(100% - 36px);
+}
+
+.left-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.right-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Trennstrich im Header */
+.header-separator {
+  width: 1px;
+  height: 28px;
+  background: #d0d0d0;
+  border-radius: 1px;
+  margin: 0 12px 0 12px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   FUNNEL-BUTTONS (dynamisch)
+   ============================================ */
+
+/* Basis für alle Funnel-Buttons */
+.funnel-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 580;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  color: #333;
+  height: auto;
+  margin-left: 8px;
+}
+
+.funnel-btn:first-of-type {
+  margin-left: 0;
+}
+
+/* Normal Hover (benutzt CSS-Variable) */
+.funnel-btn:hover {
+  background: var(--funnel-color);
+  color: #fff;
+  border-color: var(--funnel-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Active (behält Farbe) */
+.funnel-btn.active {
+  background: var(--funnel-color);
+  color: #fff;
+  border-color: var(--funnel-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Active Hover (dunklere Variante) */
+.funnel-btn.active:hover {
+  filter: brightness(0.85);
+}
+
+/* Click */
+.funnel-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Add Funnel Button (+) - wie im Footer */
+.add-funnel-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #333;
+  font-size: 20px;
+  font-weight: 400;
+  width: 34px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  border-radius: 6px;
+}
+
+.add-funnel-btn:hover {
+  background: #f7f7f7 !important;
+  border: 1px solid #ccc !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.add-funnel-btn:active {
+  background: #ececec !important;
+  border-color: #aaa !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================
+   TABELLE
+   ============================================ */
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 8px;
+  padding: 0 0 6px 0;
+  margin: 0 0 12px 0;
+  box-sizing: border-box;
+}
+
+table {
+  width: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  min-width: 1900px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 0;
+}
+
+
+/* Kopfzeile */
+thead th {
+  background: var(--header-bg);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.1;
+  padding: 3px 6px;
+  border: 1px solid var(--border-dark);
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Allgemeine Zellen */
+td {
+  border: 1px solid var(--border-light);
+  padding: 4px 6px;
+  font-size: 13px;
+  vertical-align: middle;
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+/* Berechnete KPI-Felder (grau) */
+td.calc {
+  background: var(--formula-bg);
+  color: #444;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Wochentag-Spalte */
+td.weekday {
+  text-align: center;
+}
+
+/* Sonntag (orange) */
+td.sunday-cell {
+  background: #dc8c37 !important;
+  color: #f2f2f2 !important;
+  font-weight: 600 !important;
+  text-align: center;
+}
+
+/* ============================================
+   EINGABEFELDER
+   ============================================ */
+input[type="text"],
+input[type="number"],
+input[type="date"] {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 13px;
+  color: #000;
+  outline: none;
+  box-shadow: none;
+  line-height: 1.2;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus {
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Pfeile aus number-Feldern entfernen */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ============================================
+   TAG & DATUM SPALTEN (erste 2 Spalten)
+   ============================================ */
+#tracker tbody td:nth-child(1),
+#tracker tbody td:nth-child(2) {
+  background: #696969;
+  color: #f2f2f2;
+  font-weight: 400;
+  border: none;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* ============================================
+   WEEKLY-ZEILEN
+   ============================================ */
+tr[data-week] td:nth-child(1),
+tr[data-week] td:nth-child(2) {
+  background: #696969 !important;
+  color: #f2f2f2 !important;
+  font-weight: 400 !important;
+  border: none !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+tr[data-week] td {
+  border: 1px solid var(--border-light);
+  border-top: none;
+  font-size: 13px;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 400;
+  background: #fff;
+  color: #000;
+}
+
+tr[data-week] td.calc {
+  background: var(--formula-bg);
+  color: #444;
+}
+
+#weekly-header td {
+  border-top: 2px solid #fff;
+}
+
+/* ============================================
+   FOOTER / TOTAL-Zeile (Monatssheet)
+   ============================================ */
+tfoot td {
+  border: 1px solid var(--border-dark);
+  background: var(--header-bg);
+  color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 800;
+}
+
+tfoot td.total-merged {
+  background: var(--header-bg);
+  color: #fff;
+  font-weight: 800;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid var(--border-dark);
+  font-size: 14px;
+}
+
+tfoot tr#summary-row td {
+  background: var(--header-bg) !important;
+  color: #fff !important;
+  font-weight: 800;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid var(--border-dark);
+}
+
+tfoot tr#summary-row td.calc {
+  background: var(--header-bg) !important;
+  color: #fff !important;
+}
+
+/* Wiederholte Header (über TOTAL) */
+.repeat-header td,
+tfoot .repeat-head {
+  background: var(--header-bg);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.1;
+  padding: 3px 6px;
+  border: 1px solid var(--border-dark);
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* TOTAL-Zeile: keine Sonderfarbe auf Tag & Datum */
+tfoot tr#summary-row td:nth-child(1),
+tfoot tr#summary-row td:nth-child(2) {
+  background: var(--header-bg) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+/* ============================================
+   JAHRESDASHBOARD
+   ============================================ */
+#year-body td,
+#year-summary td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* TOTAL-Zeile: alle Felder dunkelgrau */
+#year-summary td {
+  background: var(--header-bg) !important;
+  color: #fff !important;
+  font-weight: 800;
+  border: 1px solid var(--border-dark);
+}
+
+#year-summary td.calc {
+  background: var(--header-bg) !important;
+  color: #fff !important;
+}
+
+/* Monatsnamen (Jan–Dez): wie Tag/Datum */
+#year-body td:first-child {
+  background: #696969 !important;
+  color: #fff !important;
+  font-weight: 400 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  border: none !important;
+}
+
+/* Quartale (Q1–Q4) */
+tr[data-quarter] td {
+  border: 1px solid var(--border-light);
+  font-size: 13px;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 400;
+  background: #fff;
+  color: #000;
+}
+
+tr[data-quarter] td:first-child {
+  background: #696969;
+  color: #f2f2f2;
+  font-weight: 400;
+  border: none;
+  text-align: center;
+}
+
+tr[data-quarter] td.calc {
+  background: var(--formula-bg);
+  color: #444;
+}
+
+/* Spacer zwischen TOTAL und Quartalen */
+.spacer-row td {
+  background: var(--bg) !important;
+  border: none !important;
+  height: 20px;
+}
+
+/* ============================================
+   ZOOM AREA
+   ============================================ */
+#zoomArea {
+  transform-origin: top left;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  min-width: 100%;
+}
+
+/* ============================================
+   ZOOM CONTROLS
+   ============================================ */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.zoom-controls button {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 28px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.zoom-controls button:hover {
+  background: #f3f3f3;
+  border-color: #aaa;
+  transform: translateY(-1px);
+}
+
+.zoom-controls button:active {
+  background: #eaeaea;
+  border-color: #999;
+  transform: translateY(0);
+}
+
+.zoom-controls span {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0 10px;
+  min-width: 60px;
+  text-align: center;
+  font-weight: 600;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   JAHR-DROPDOWN
+   ============================================ */
+.year-select {
+  position: relative;
+  display: inline-block;
+  z-index: 9999;
+}
+
+.year-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 580;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.year-btn:hover {
+  background: #f3f3f3;
+  border-color: #aaa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.year-btn:active {
+  background: #eaeaea;
+  border-color: #999;
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* CSS-Dreieck */
+.year-btn::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #888;
+  margin-left: 6px;
+}
+
+.year-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 100%;
+  width: 100%;
+  padding: 4px 0;
+  z-index: 10000;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.year-dropdown.hidden {
+  display: none;
+}
+
+.year-option {
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: center;
+}
+
+.year-option:hover {
+  background: #f2f2f2;
+}
+
+/* Trennlinie zwischen ALLEN Jahren */
+.year-option+.year-option {
+  border-top: 1px solid #eee;
+}
+
+/* ============================================
+   TABS (fixiert unten)
+   ============================================ */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  z-index: 1000;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+#tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-left: 22px;
+  padding-right: 12px;
+  scroll-behavior: smooth;
+}
+
+#tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+#tabs::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+#tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab {
+  background: #f6f6f6;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  background: #eaeaea;
+  transform: translateY(-1px);
+}
+
+.tab.active {
+  background: #333 !important;
+  color: #fff !important;
+  border-color: #333 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.tab.add {
+  background: transparent !important;
+  border: none !important;
+  color: #333;
+  font-size: 20px;
+  font-weight: 400;
+  width: 34px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab.add:hover {
+  background: #f7f7f7 !important;
+  border: 1px solid #ccc !important;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.tab.add:active {
+  background: #ececec !important;
+  border-color: #aaa !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Trennlinie zwischen Dashboard und + */
+.tab-separator {
+  width: 1px;
+  height: 28px;
+  background: #d0d0d0;
+  border-radius: 1px;
+  margin: 0 2px 0 6px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   MODAL (Neuer Monat)
+   ============================================ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  padding: 24px 32px;
+  max-width: 400px;
+  width: 100%;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.modal-content h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.modal-content .custom-fields {
+  margin-top: 8px;
+}
+
+.modal-content .custom-fields.hidden {
+  display: none;
+}
+
+.modal-content .custom-fields label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.modal-content input[type="number"],
+.modal-content select {
+  margin-left: 6px;
+  padding: 4px 6px;
+  font-size: 14px;
+}
+
+#yearInput {
+  width: 90px;
+  text-align: center;
+  padding: 4px;
+  font-size: 14px;
+}
+
+.modal-content .buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modal-content button {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modal-content button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#cancelModal {
+  background: #ccc;
+  color: #333;
+}
+
+#cancelModal:hover {
+  background: #bbb;
+}
+
+#createMonth {
+  background: #333;
+  color: #fff;
+}
+
+#createMonth:hover {
+  background: #222;
+}
+
+/* ============================================
+   FUNNEL MODAL - Erweiterungen
+   ============================================ */
+
+/* Farb-Auswahl */
+.color-picker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.color-option {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.active {
+  border-color: #000;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Input-Felder im Funnel-Modal */
+#funnelNameInput {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+
+#funnelNameInput:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+}
+
+/* Template-Select */
+#templateSelect {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#templateSelect:focus {
+  outline: none;
+  border-color: #1877f2;
+}
+
+/* ============================================
+   KONTEXTMENÜ (Rechtsklick auf Tab)
+   ============================================ */
+.context-menu {
+  position: fixed;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  display: none;
+  min-width: 180px;
+  overflow: hidden;
+  font-family: Inter, system-ui, sans-serif;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: background 0.15s ease;
+}
+
+.context-menu button:hover {
+  background: #f5f5f5;
+}
+
+.context-menu button:active {
+  background: #ebebeb;
+}
+
+.context-menu button+button {
+  border-top: 1px solid #eee;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   MOBILE OPTIMIERUNG
+   ============================================ */
+@media (max-width: 900px) {
+  #tabs .tab {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  #tabs {
+    padding-left: 12px !important;
+    gap: 6px;
+  }
+
+  #app {
+    padding: 0 12px 70px 12px;
+  }
+}
+
+/* ============================================
+   DELETE MODAL (Funnel löschen)
+   ============================================ */
+. delete-modal {
+  max-width: 450px;
+}
+
+.delete-modal h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #d32f2f;
+}
+
+.delete-modal p {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.delete-modal .warning-text {
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #e65100;
+  font-weight: 500;
+  margin-top: 16px;
+}
+
+/* Button Styles */
+.btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+  border-color: #aaa;
+}
+
+.btn-danger {
+  background: #d32f2f;
+  color: #fff;
+  border: 1px solid #d32f2f;
+}
+
+.btn-danger:hover {
+  background: #b71c1c;
+  border-color: #b71c1c;
+}
+
+. btn-danger:active {
+  background: #9a0007;
+  transform: translateY(0);
+}
+
+/* ============================================
+   IMPORT BUTTON (im Header - wie Jahr-Button)
+   ============================================ */
+.import-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 580;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  color: #333;
+  height: auto;
+  min-height: 28px;
+  flex-shrink: 0;
+}
+
+.import-btn:hover {
+  background: #f3f3f3;
+  border-color: #aaa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.import-btn:active {
+  background: #eaeaea;
+  border-color: #999;
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* ============================================
+   IMPORT MODAL
+   ============================================ */
+.import-modal {
+  max-width: 600px;
+  max-height: 85vh;
+  /* 🔥 Maximale Höhe: 85% des Viewports */
+  overflow-y: auto;
+  /* 🔥 Vertikales Scrollen aktivieren */
+  display: flex;
+  flex-direction: column;
+}
+
+.import-step {
+  display: block;
+}
+
+.import-step. hidden {
+  display: none;
+}
+
+.import-modal label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.import-modal select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.import-modal select:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+}
+
+/* ============================================
+   COLUMN MAPPING LIST
+   ============================================ */
+.column-mapping-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9f9f9;
+}
+
+.mapping-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.mapping-row:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.mapping-row. matched {
+  border-color: #4caf50;
+  background: #f1f8f4;
+}
+
+.mapping-row.suggested {
+  border-color: #ff9800;
+  background: #fff8f0;
+}
+
+.mapping-row.unmapped {
+  border-color: #ddd;
+  background: #fafafa;
+}
+
+.mapping-row. notfound {
+  border-color: #f44336;
+  background: #ffebee;
+}
+
+.mapping-csv-col {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.mapping-arrow {
+  color: #999;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.mapping-clarity-col {
+  flex: 1. 5;
+}
+
+.mapping-clarity-col select {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.mapping-clarity-col select:focus {
+  outline: none;
+  border-color: #1877f2;
+}
+
+.mapping-status {
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.mapping-status.matched {
+  color: #4caf50;
+  background: #e8f5e9;
+}
+
+.mapping-status.suggested {
+  color: #ff9800;
+  background: #fff3e0;
+}
+
+.mapping-status.ignored {
+  color: #999;
+  background: #f5f5f5;
+}
+
+.mapping-status.notfound {
+  color: #f44336;
+  background: #ffcdd2;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: #1877f2;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1464d8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: #f3f3f3;
+  border-color: #aaa;
+}
+
+/* ============================================
+   IMPORT MODAL - SCROLL FIX
+   ============================================ */
+.import-modal {
+  max-width: 600px;
+  max-height: 80%;
+  /* 85% der Bildschirmhöhe */
+  overflow-y: auto;
+  /* Scroll aktivieren */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Buttons immer unten sichtbar */
+.import-modal . buttons {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  background: #fff;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+/* Mapping-Liste scrollbar */
+.column-mapping-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9f9f9;
+  flex: 1;
+  /* 🔥 Nimmt verfügbaren Platz */
+}
+
+/* ============================================
+   IMPORT MODAL - STEPS
+   ============================================ */
+.import-step {
+  display: block;
+}
+
+.import-step.hidden {
+  display: none ! important;
+  /* 🔥 ! important hinzufügen */
+}
+
+/* ============================================
+   CSV DATEI-AUSWAHL BUTTON (Feld-Stil)
+   ============================================ */
+#selectCsvBtn {
+  background: #f9f9f9 ! important;
+  /* 🔥 Grau von Anfang an */
+  border: 1px solid #ccc !important;
+  /* 🔥 Sichtbarerer Border */
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #333 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-align: center !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  /* 🔥 Leichter Schatten */
+}
+
+#selectCsvBtn:hover {
+  background: #ececec !important;
+  /* 🔥 Dunkler beim Hover */
+  border-color: #aaa !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+#selectCsvBtn:active {
+  background: #e0e0e0 !important;
+  /* 🔥 Noch dunkler beim Click */
+  border-color: #999 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ============================================
+   BUTTON STATES (disabled)
+   ============================================ */
+. btn-primary:disabled,
+.btn-secondary:disabled {
+  background: #e0e0e0 ! important;
+  color: #999 !important;
+  border-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn-primary:disabled:hover,
+.btn-secondary:disabled:hover {
+  background: #e0e0e0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ============================================
+   WIZARD MODAL
+   ============================================ */
+.wizard-modal {
+  max-width: 650px;
+  padding: 32px;
+}
+
+.wizard-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 12px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+. toggle-btn:hover {
+  background: #f5f5f5;
+}
+
+.toggle-btn.active {
+  background: #1877f2;
+  color: #fff;
+}
+
+/* Wizard Progress Dots */
+.wizard-progress {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.wizard-progress . dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.wizard-progress .dot.active {
+  background: #1877f2;
+  transform: scale(1.2);
+}
+
+/* Wizard Steps */
+.wizard-step {
+  display: none;
+}
+
+.wizard-step.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+. wizard-step h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.wizard-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* 🔥 Default: 2 Spalten */
+  gap: 14px;
+  margin-bottom: 32px;
+  /* 🔥 Mehr Abstand zum Button */
+}
+
+/* 🔥 Desktop: 4 Spalten für Traffic-Auswahl */
+@media (min-width: 768px) {
+  .wizard-step[data-step="1"] .wizard-options {
+    grid-template-columns: repeat(4, 1fr);
+    /* 🔥 4 nebeneinander */
+  }
+}
+
+/* 🔥 Tablet: 2 Spalten */
+@media (max-width: 767px) {
+  .wizard-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 🔥 Mobile: 1 Spalte */
+@media (max-width: 500px) {
+  .wizard-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-option {
+  cursor: pointer;
+  display: block;
+}
+
+.wizard-option input[type="radio"] {
+  display: none;
+}
+
+.option-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px 12px;
+  /* 🔥 Weniger Padding */
+  text-align: center;
+  transition: all 0.2s ease;
+  background: #fff;
+  min-height: 140px;
+  /* 🔥 Feste Mindesthöhe */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* 🔥 Abstand zwischen Icon & Text */
+}
+
+.wizard-option:hover .option-card {
+  border-color: #1877f2;
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.15);
+  transform: translateY(-2px);
+}
+
+.wizard-option input[type="radio"]:checked+.option-card {
+  border-color: #1877f2;
+  background: #f0f7ff;
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0. 25);
+}
+
+.option-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.option-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.option-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Wizard Hint */
+.wizard-hint {
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #666;
+  margin-top: 16px;
+}
+
+/* Wizard Summary */
+.wizard-summary {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.wizard-summary h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1877f2;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-weight: 600;
+  color: #666;
+}
+
+.wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.wizard-nav-left,
+.wizard-nav-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.wizard-nav-left {
+  flex: 0 0 auto;
+}
+
+.wizard-nav-right {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.wizard-btn-primary,
+.wizard-btn-secondary {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wizard-btn-primary {
+  background: #1877f2;
+  color: #fff;
+  flex: 1;
+}
+
+. wizard-btn-primary:hover:not(:disabled) {
+  background: #1464d8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+}
+
+.wizard-btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.wizard-btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.wizard-btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.wizard-btn-cancel {
+  padding: 12px 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+  color: #666;
+}
+
+.wizard-btn-cancel:hover {
+  background: #f5f5f5;
+  border-color: #aaa;
+  color: #333;
+}
+
+.wizard-btn-cancel:active {
+  background: #e8e8e8;
+}
+
+/* Hidden States */
+.wizard-container. hidden,
+.preset-container.hidden {
+  display: none;
+}
+
+/* ============================================
+   MODAL TOGGLE FIX - MUST BE LAST!
+   ============================================ */
+#wizardMode.hidden,
+#presetMode.hidden {
+  display: none !important;
+}
