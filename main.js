@@ -772,7 +772,7 @@
       e.preventDefault();
 
       funnel.color = selectedColor;
-      FunnelAPI.saveFunnels(funnels);
+      FunnelAPI.saveFunnels(funnels)
 
       modal.classList.add("hidden");
       buildGlobalHeader(window.activeYear);
