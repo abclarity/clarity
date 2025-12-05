@@ -2,9 +2,23 @@
 
   const ITEMS_PER_PAGE = 50;
 
+  const EVENT_TYPES = [
+    { id: 'lead', label: 'Leads', icon: '📧' },
+    { id: 'survey', label: 'Survey', icon: '📋' },
+    { id: 'surveyQuali', label: 'Survey Quali', icon: '✅' },
+    { id: 'settingBooking', label: 'Setting Booking', icon: '📅' },
+    { id: 'settingTermin', label: 'Setting Termin', icon: '📆' },
+    { id: 'settingCall', label: 'Setting Call', icon: '☎️' },
+    { id: 'closingBooking', label: 'Closing Booking', icon: '🎯' },
+    { id: 'closingTermin', label: 'Closing Termin', icon: '🎯' },
+    { id: 'closingCall', label: 'Closing Call', icon: '📞' },
+    { id: 'unit', label: 'Units', icon: '💰' }
+  ];
+
   const DataPool = {
     currentPage: 1,
-    totalLeads: 0,
+    totalItems: 0,
+    currentTab: 'lead',
     filters: {
       search: '',
       funnel: '',
@@ -37,6 +51,15 @@
           </div>
         </div>
 
+        <div class="datapool-tabs">
+          ${EVENT_TYPES.map(type => `
+            <button class="datapool-tab ${type.id === this.currentTab ? 'active' : ''}"
+                    data-tab="${type.id}">
+              ${type.icon} ${type.label}
+            </button>
+          `).join('')}
+        </div>
+
         <div class="datapool-filters">
           <input type="text" id="searchInput" placeholder="Suche nach Name, E-Mail oder Telefon..." />
 
@@ -61,22 +84,11 @@
 
         <div class="datapool-table-container">
           <table class="datapool-table">
-            <thead>
-              <tr>
-                <th data-sort="name">Name ▼</th>
-                <th data-sort="primary_email">E-Mail ▼</th>
-                <th data-sort="primary_phone">Telefon ▼</th>
-                <th data-sort="source">Traffic Source ▼</th>
-                <th data-sort="utm_campaign">UTM Campaign ▼</th>
-                <th data-sort="country">Land ▼</th>
-                <th data-sort="funnel_id">Funnel ▼</th>
-                <th data-sort="created_at">Erstellt am ▼</th>
-                <th>Aktionen</th>
-              </tr>
+            <thead id="tableHead">
             </thead>
-            <tbody id="leadsTableBody">
+            <tbody id="tableBody">
               <tr>
-                <td colspan="9" class="loading-cell">Laden...</td>
+                <td colspan="10" class="loading-cell">Laden...</td>
               </tr>
             </tbody>
           </table>
@@ -91,7 +103,8 @@
 
       await this.loadFunnelOptions();
       this.attachListeners();
-      await this.loadLeads();
+      this.renderTableHeaders();
+      await this.loadTabData();
     },
 
     async loadFunnelOptions() {
@@ -108,6 +121,13 @@
     },
 
     attachListeners() {
+      document.querySelectorAll('.datapool-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          const tabId = e.currentTarget.dataset.tab;
+          this.switchTab(tabId);
+        });
+      });
+
       const searchInput = document.getElementById('searchInput');
       if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -154,7 +174,7 @@
       if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener('click', () => {
           this.currentPage = 1;
-          this.loadLeads();
+          this.loadTabData();
         });
       }
 
@@ -170,7 +190,7 @@
         prevPageBtn.addEventListener('click', () => {
           if (this.currentPage > 1) {
             this.currentPage--;
-            this.loadLeads();
+            this.loadTabData();
           }
         });
       }
@@ -179,7 +199,7 @@
       if (nextPageBtn) {
         nextPageBtn.addEventListener('click', () => {
           this.currentPage++;
-          this.loadLeads();
+          this.loadTabData();
         });
       }
 
@@ -196,7 +216,9 @@
           this.openCSVImport();
         });
       }
+    },
 
+    attachSortListeners() {
       document.querySelectorAll('.datapool-table th[data-sort]').forEach(th => {
         th.addEventListener('click', (e) => {
           const sortField = e.target.dataset.sort;
@@ -208,9 +230,46 @@
           }
           this.currentPage = 1;
           this.updateSortIcons();
-          this.loadLeads();
+          this.loadTabData();
         });
       });
+    },
+
+    switchTab(tabId) {
+      this.currentTab = tabId;
+      this.currentPage = 1;
+
+      document.querySelectorAll('.datapool-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabId);
+      });
+
+      this.renderTableHeaders();
+      this.loadTabData();
+    },
+
+    renderTableHeaders() {
+      const tableHead = document.getElementById('tableHead');
+      if (!tableHead) return;
+
+      const isUnitsTab = this.currentTab === 'unit';
+
+      tableHead.innerHTML = `
+        <tr>
+          <th data-sort="name">Name ▼</th>
+          <th data-sort="primary_email">E-Mail ▼</th>
+          <th data-sort="primary_phone">Telefon ▼</th>
+          <th data-sort="event_date">Event-Datum ▼</th>
+          <th data-sort="funnel_id">Funnel ▼</th>
+          <th data-sort="source">Traffic Source ▼</th>
+          ${isUnitsTab ? '<th data-sort="revenue">Revenue ▼</th>' : ''}
+          ${isUnitsTab ? '<th data-sort="cash">Cash ▼</th>' : ''}
+          <th data-sort="created_at">Erstellt am ▼</th>
+          <th>Aktionen</th>
+        </tr>
+      `;
+
+      this.attachSortListeners();
+      this.updateSortIcons();
     },
 
     updateSortIcons() {
@@ -243,19 +302,38 @@
       document.getElementById('dateToFilter').value = '';
 
       this.currentPage = 1;
-      this.loadLeads();
+      this.loadTabData();
     },
 
-    async loadLeads() {
-      const tbody = document.getElementById('leadsTableBody');
+    async loadTabData() {
+      const tbody = document.getElementById('tableBody');
       if (!tbody) return;
 
-      tbody.innerHTML = '<tr><td colspan="9" class="loading-cell">Laden...</td></tr>';
+      const isUnitsTab = this.currentTab === 'unit';
+      const colCount = isUnitsTab ? 10 : 8;
+      tbody.innerHTML = `<tr><td colspan="${colCount}" class="loading-cell">Laden...</td></tr>`;
 
       try {
         let query = window.SupabaseClient
-          .from('leads')
-          .select('*', { count: 'exact' });
+          .from('events')
+          .select(`
+            id,
+            event_type,
+            event_date,
+            funnel_id,
+            source,
+            revenue,
+            cash,
+            created_at,
+            leads!inner (
+              id,
+              name,
+              primary_email,
+              primary_phone,
+              country
+            )
+          `, { count: 'exact' })
+          .eq('event_type', this.currentTab);
 
         if (this.filters.funnel) {
           query = query.eq('funnel_id', this.filters.funnel);
@@ -266,19 +344,19 @@
         }
 
         if (this.filters.country) {
-          query = query.eq('country', this.filters.country);
+          query = query.eq('leads.country', this.filters.country);
         }
 
         if (this.filters.dateFrom) {
-          query = query.gte('created_at', this.filters.dateFrom);
+          query = query.gte('event_date', this.filters.dateFrom);
         }
 
         if (this.filters.dateTo) {
-          query = query.lte('created_at', this.filters.dateTo + 'T23:59:59');
+          query = query.lte('event_date', this.filters.dateTo);
         }
 
         if (this.filters.search) {
-          query = query.or(`name.ilike.%${this.filters.search}%,primary_email.ilike.%${this.filters.search}%,primary_phone.ilike.%${this.filters.search}%`);
+          query = query.or(`leads.name.ilike.%${this.filters.search}%,leads.primary_email.ilike.%${this.filters.search}%,leads.primary_phone.ilike.%${this.filters.search}%`);
         }
 
         query = query.order(this.sortBy, { ascending: this.sortOrder === 'asc' });
@@ -289,37 +367,50 @@
         const { data, error, count } = await query;
 
         if (error) {
-          console.error('❌ Error loading leads:', error);
-          tbody.innerHTML = '<tr><td colspan="9" class="error-cell">Fehler beim Laden der Daten</td></tr>';
+          console.error('❌ Error loading tab data:', error);
+          tbody.innerHTML = `<tr><td colspan="${colCount}" class="error-cell">Fehler beim Laden der Daten</td></tr>`;
           return;
         }
 
-        this.totalLeads = count || 0;
+        this.totalItems = count || 0;
         await this.loadFilterOptions();
 
         if (!data || data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Keine Leads vorhanden</td></tr>';
+          tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-cell">Keine Einträge vorhanden</td></tr>`;
           this.updatePagination();
           return;
         }
 
         tbody.innerHTML = '';
-        data.forEach(lead => {
-          const row = this.createLeadRow(lead);
+        data.forEach(event => {
+          const item = {
+            event_id: event.id,
+            lead_id: event.leads.id,
+            lead_name: event.leads.name,
+            lead_email: event.leads.primary_email,
+            lead_phone: event.leads.primary_phone,
+            event_date: event.event_date,
+            funnel_id: event.funnel_id,
+            source: event.source,
+            revenue: event.revenue,
+            cash: event.cash,
+            created_at: event.created_at
+          };
+          const row = this.createDataRow(item);
           tbody.appendChild(row);
         });
 
         this.updatePagination();
       } catch (err) {
-        console.error('❌ Error loading leads:', err);
-        tbody.innerHTML = '<tr><td colspan="9" class="error-cell">Fehler beim Laden der Daten</td></tr>';
+        console.error('❌ Error loading tab data:', err);
+        tbody.innerHTML = `<tr><td colspan="${colCount}" class="error-cell">Fehler beim Laden der Daten</td></tr>`;
       }
     },
 
     async loadFilterOptions() {
       try {
         const { data: sources } = await window.SupabaseClient
-          .from('leads')
+          .from('events')
           .select('source')
           .not('source', 'is', null)
           .neq('source', '');
@@ -338,13 +429,13 @@
           sourceFilter.value = currentValue;
         }
 
-        const { data: countries } = await window.SupabaseClient
+        const { data: leadsData } = await window.SupabaseClient
           .from('leads')
           .select('country')
           .not('country', 'is', null)
           .neq('country', '');
 
-        const uniqueCountries = [...new Set(countries?.map(c => c.country) || [])];
+        const uniqueCountries = [...new Set(leadsData?.map(c => c.country) || [])];
         const countryFilter = document.getElementById('countryFilter');
         if (countryFilter) {
           const currentValue = countryFilter.value;
@@ -362,32 +453,36 @@
       }
     },
 
-    createLeadRow(lead) {
+    createDataRow(item) {
       const tr = document.createElement('tr');
-      tr.dataset.leadId = lead.id;
+      tr.dataset.eventId = item.event_id;
+      tr.dataset.leadId = item.lead_id;
 
-      const createdAt = new Date(lead.created_at).toLocaleDateString('de-DE');
+      const eventDate = new Date(item.event_date).toLocaleDateString('de-DE');
+      const createdAt = new Date(item.created_at).toLocaleDateString('de-DE');
+      const isUnitsTab = this.currentTab === 'unit';
 
       tr.innerHTML = `
-        <td>${lead.name || '-'}</td>
-        <td>${lead.primary_email || '-'}</td>
-        <td>${lead.primary_phone || '-'}</td>
-        <td>${lead.source || '-'}</td>
-        <td>${lead.utm_campaign || '-'}</td>
-        <td>${lead.country || '-'}</td>
-        <td>${lead.funnel_id || '-'}</td>
+        <td>${item.lead_name || '-'}</td>
+        <td>${item.lead_email || '-'}</td>
+        <td>${item.lead_phone || '-'}</td>
+        <td>${eventDate}</td>
+        <td>${item.funnel_id || '-'}</td>
+        <td>${item.source || '-'}</td>
+        ${isUnitsTab ? `<td>${item.revenue ? item.revenue.toFixed(2) + ' €' : '-'}</td>` : ''}
+        ${isUnitsTab ? `<td>${item.cash ? item.cash.toFixed(2) + ' €' : '-'}</td>` : ''}
         <td>${createdAt}</td>
         <td class="actions-cell">
-          <button class="btn-icon edit-btn" data-lead-id="${lead.id}" title="Bearbeiten">✏️</button>
-          <button class="btn-icon delete-btn" data-lead-id="${lead.id}" title="Löschen">🗑️</button>
+          <button class="btn-icon view-btn" data-lead-id="${item.lead_id}" title="Lead ansehen">👁️</button>
+          <button class="btn-icon delete-btn" data-event-id="${item.event_id}" title="Event löschen">🗑️</button>
         </td>
       `;
 
-      const editBtn = tr.querySelector('.edit-btn');
-      if (editBtn) {
-        editBtn.addEventListener('click', (e) => {
+      const viewBtn = tr.querySelector('.view-btn');
+      if (viewBtn) {
+        viewBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.openEditLeadModal(lead.id);
+          this.openLeadDetail(item.lead_id);
         });
       }
 
@@ -395,25 +490,25 @@
       if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.deleteLead(lead.id);
+          this.deleteEvent(item.event_id);
         });
       }
 
       tr.addEventListener('click', () => {
-        this.openLeadDetail(lead.id);
+        this.openLeadDetail(item.lead_id);
       });
 
       return tr;
     },
 
     updatePagination() {
-      const totalPages = Math.ceil(this.totalLeads / ITEMS_PER_PAGE);
+      const totalPages = Math.ceil(this.totalItems / ITEMS_PER_PAGE);
       const pageInfo = document.getElementById('pageInfo');
       const prevBtn = document.getElementById('prevPageBtn');
       const nextBtn = document.getElementById('nextPageBtn');
 
       if (pageInfo) {
-        pageInfo.textContent = `Seite ${this.currentPage} von ${totalPages || 1} (${this.totalLeads} Leads)`;
+        pageInfo.textContent = `Seite ${this.currentPage} von ${totalPages || 1} (${this.totalItems} Einträge)`;
       }
 
       if (prevBtn) {
@@ -422,6 +517,38 @@
 
       if (nextBtn) {
         nextBtn.disabled = this.currentPage >= totalPages;
+      }
+    },
+
+    async deleteEvent(eventId) {
+      if (!confirm('Möchten Sie dieses Event wirklich löschen?')) {
+        return;
+      }
+
+      try {
+        const { error } = await window.SupabaseClient
+          .from('events')
+          .delete()
+          .eq('id', eventId);
+
+        if (error) {
+          console.error('❌ Error deleting event:', error);
+          if (window.Toast) {
+            window.Toast.error('Fehler beim Löschen des Events');
+          }
+          return;
+        }
+
+        if (window.Toast) {
+          window.Toast.success('Event erfolgreich gelöscht');
+        }
+
+        await this.loadTabData();
+      } catch (err) {
+        console.error('❌ Error deleting event:', err);
+        if (window.Toast) {
+          window.Toast.error('Fehler beim Löschen des Events');
+        }
       }
     },
 
@@ -567,18 +694,35 @@
           metadata: {}
         };
 
-        const { data, error } = await window.SupabaseClient
+        const { data: lead, error: leadError } = await window.SupabaseClient
           .from('leads')
           .insert([leadData])
           .select()
           .single();
 
-        if (error) {
-          console.error('❌ Error creating lead:', error);
+        if (leadError) {
+          console.error('❌ Error creating lead:', leadError);
           if (window.Toast) {
             window.Toast.error('Fehler beim Erstellen des Leads');
           }
           return;
+        }
+
+        const eventData = {
+          lead_id: lead.id,
+          event_type: 'lead',
+          event_date: new Date().toISOString().split('T')[0],
+          funnel_id: funnelId || null,
+          source: source || null,
+          metadata: {}
+        };
+
+        const { error: eventError } = await window.SupabaseClient
+          .from('events')
+          .insert([eventData]);
+
+        if (eventError) {
+          console.error('❌ Error creating lead event:', eventError);
         }
 
         if (window.Toast) {
@@ -586,7 +730,7 @@
         }
 
         document.getElementById('leadModal')?.remove();
-        await this.loadLeads();
+        await this.loadTabData();
       } catch (err) {
         console.error('❌ Error creating lead:', err);
         if (window.Toast) {
@@ -658,7 +802,7 @@
         }
 
         document.getElementById('leadModal')?.remove();
-        await this.loadLeads();
+        await this.loadTabData();
       } catch (err) {
         console.error('❌ Error updating lead:', err);
         if (window.Toast) {
@@ -690,7 +834,7 @@
           window.Toast.success('Lead erfolgreich gelöscht');
         }
 
-        await this.loadLeads();
+        await this.loadTabData();
       } catch (err) {
         console.error('❌ Error deleting lead:', err);
         if (window.Toast) {
