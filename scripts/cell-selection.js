@@ -527,45 +527,31 @@
     });
   }
 
-  // === Setup Cell Handlers ===
-  function setupCell(td, input) {
-    if (!td) return;
+// === Setup Cell Handlers ===
+function setupCell(td, input) {
+  if (! td) return;
 
-    td.addEventListener('click', (e) => {
-      if (!isSelectableCell(td)) return;
-      if (editingCell === td || isExitingEditMode) return;
+  // ❌ ALLE Click-Handler ENTFERNEN! 
+  // Die Selektion wird NUR über globale mousedown/mousemove/mouseup gesteuert! 
 
-      e.preventDefault();
+  if (input) {
+    // Doppelklick → Edit Mode
+    td.addEventListener('dblclick', (e) => {
+      e. preventDefault();
       e.stopPropagation();
-
-      const isCmd = e.metaKey || e.ctrlKey;
-      const isShift = e.shiftKey;
-
-      if (isShift && lastSelectedCell) {
-        selectRange(lastSelectedCell, td);
-      } else if (isCmd) {
-        toggleCell(td);
-      } else {
-        selectCell(td);
-      }
+      enterEditMode(td);
     });
 
-    if (input) {
-      td.addEventListener('dblclick', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        enterEditMode(td);
-      });
-
-      input.addEventListener('blur', (e) => {
-        setTimeout(() => {
-          if (editingCell === td && !isExitingEditMode) {
-            exitEditMode(true);
-          }
-        }, 100);
-      });
-    }
+    // Blur → Exit Edit Mode
+    input.addEventListener('blur', (e) => {
+      setTimeout(() => {
+        if (editingCell === td && ! isExitingEditMode) {
+          exitEditMode(true);
+        }
+      }, 100);
+    });
   }
+}
 
   // === Global Mouse Handlers ===
   document.addEventListener('mousedown', handleMouseDown);
