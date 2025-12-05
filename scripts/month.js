@@ -103,9 +103,19 @@
           td.textContent = weekdayLetter(dateObj);
           td.classList.add("weekday");
           if (dateObj.getDay() === 0) td.classList.add("sunday-cell");
+
+          // 🔥 Setup Cell Selection for all cells
+          if (window.CellSelection) {
+            window.CellSelection.setupCell(td, null);
+          }
         }
         else if (col === "Datum") {
           td.innerHTML = `<span class="date">${isoShort}</span>`;
+
+          // 🔥 Setup Cell Selection for all cells
+          if (window.CellSelection) {
+            window.CellSelection.setupCell(td, null);
+          }
         }
         else if (INPUT_KEYS.includes(col)) {
           const input = document.createElement("input");
@@ -202,6 +212,11 @@
           td.textContent = "–";
           td.classList.add("calc");
           td.dataset.key = `${col}_${d}`;
+
+          // 🔥 Setup Cell Selection for KPI cells
+          if (window.CellSelection) {
+            window.CellSelection.setupCell(td, null);
+          }
         }
 
         tr.appendChild(td);
@@ -217,9 +232,32 @@
 
     calcAllRows(y, mIdx, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
 
+    // 🔥 Setup Cell Selection for all remaining cells (thead, tfoot)
+    setupRemainingCells();
+
     // Zoom initialisieren
     if (typeof window.globalZoomInit === "function") {
       window.globalZoomInit();
+    }
+
+    function setupRemainingCells() {
+      if (!window.CellSelection) return;
+
+      // Header cells (thead)
+      const headerCells = document.querySelectorAll('#tracker thead th');
+      headerCells.forEach(th => {
+        if (window.CellSelection.isSelectableCell(th)) {
+          window.CellSelection.setupCell(th, null);
+        }
+      });
+
+      // Total row cells (tfoot)
+      const totalCells = document.querySelectorAll('#tracker tfoot td');
+      totalCells.forEach(td => {
+        if (window.CellSelection.isSelectableCell(td)) {
+          window.CellSelection.setupCell(td, null);
+        }
+      });
     }
 
     function addWeeklySection(ALL_COLUMNS, INPUT_KEYS, KPI_COLS) {

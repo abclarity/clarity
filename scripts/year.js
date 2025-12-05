@@ -69,8 +69,31 @@
 
     fillYearAndQuarter(y, YEAR_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
 
+    // 🔥 Setup Cell Selection for all remaining cells (thead, tfoot)
+    setupRemainingCells();
+
     if (typeof window.globalZoomInit === "function") {
       window.globalZoomInit();
+    }
+
+    function setupRemainingCells() {
+      if (!window.CellSelection) return;
+
+      // Header cells (thead)
+      const headerCells = document.querySelectorAll('#year-table thead th');
+      headerCells.forEach(th => {
+        if (window.CellSelection.isSelectableCell(th)) {
+          window.CellSelection.setupCell(th, null);
+        }
+      });
+
+      // Total row cells (tfoot)
+      const totalCells = document.querySelectorAll('#year-table tfoot td');
+      totalCells.forEach(td => {
+        if (window.CellSelection.isSelectableCell(td)) {
+          window.CellSelection.setupCell(td, null);
+        }
+      });
     }
   }
 
@@ -92,6 +115,11 @@
       tdMon.textContent = monthShort(y, m).replace(".", "");
       tdMon.style.textAlign = "center";
       tr.appendChild(tdMon);
+
+      // 🔥 Setup Cell Selection for month name
+      if (window.CellSelection) {
+        window.CellSelection.setupCell(tdMon, null);
+      }
 
       const { totals, hasAny } = monthTotalsFromStorage(y, m, INPUT_KEYS, activeFunnelId);
 
@@ -133,6 +161,11 @@
         } else if (KPI_COLS.includes(col)) {
           td.textContent = hasAny ? formatValue(calc[col], col) : "";
           td.classList.add("calc");
+        }
+
+        // 🔥 Setup Cell Selection for all cells
+        if (window.CellSelection) {
+          window.CellSelection.setupCell(td, null);
         }
 
         tr.appendChild(td);
@@ -216,6 +249,11 @@
       tdQ.style.textAlign = "center";
       tr.appendChild(tdQ);
 
+      // 🔥 Setup Cell Selection for quarter label
+      if (window.CellSelection) {
+        window.CellSelection.setupCell(tdQ, null);
+      }
+
       const qAgg = {};
       INPUT_KEYS.forEach(k => (qAgg[k] = 0));
       let hasAny = false;
@@ -266,6 +304,11 @@
         } else if (KPI_COLS.includes(col)) {
           td.textContent = hasAny ? formatValue(calc[col], col) : "";
           td.classList.add("calc");
+        }
+
+        // 🔥 Setup Cell Selection for all quarterly cells
+        if (window.CellSelection) {
+          window.CellSelection.setupCell(td, null);
         }
 
         tr.appendChild(td);
