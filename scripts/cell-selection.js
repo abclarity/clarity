@@ -578,10 +578,11 @@ function setupCell(td, input) {
   document.addEventListener('click', (e) => {
     const clickedCell = e.target.closest('td');
 
-    if (!clickedCell && !editingCell) {
-      clearAllSelections();
-    }
-  });
+    // Clear nur wenn AUSSERHALB einer Tabelle geklickt wurde
+  if (! clickedCell && !editingCell && !e.target.closest('table')) {
+    clearAllSelections();
+  }
+});
 
   // === Public API ===
   window.CellSelection = {
