@@ -360,32 +360,60 @@
     }
   }
 
-  // === Generate Funnel Name ===
   function generateFunnelName() {
-    const trafficMap = {
-      'paid-ads': 'Paid Ads',
-      'organic': 'Organic',
-      'cold-email': 'Cold Email',
-      'cold-calls': 'Cold Calls'
-    };
+  const parts = [];
 
-    let funnelType = '';
+  // 1️⃣ Traffic
+  const trafficMap = {
+    'paid-ads': 'Paid Ads',
+    'organic': 'Organic',
+    'cold-email': 'Cold Email',
+    'cold-calls': 'Cold Calls'
+  };
+  parts.push(trafficMap[wizardState.traffic]);
 
-    if (wizardState.hasVsl === 'yes') {
-      funnelType = 'VSL';
-    } else if (wizardState.coldcallsFlow === 'direct') {
-      funnelType = 'Direct';
-    } else {
-      funnelType = 'Funnel';
-    }
+  // 2️⃣ Funnel Type
+  let funnelType = '';
 
-    const suggestedName = `${trafficMap[wizardState.traffic]} ${funnelType}`;
-    const nameInput = document.getElementById('wizardFunnelName');
-    if (nameInput) {
-      nameInput.value = suggestedName;
-      wizardState.name = suggestedName;
-    }
+  if (wizardState.coldcallsFlow === 'direct') {
+    funnelType = 'Direct';
+  } else if (wizardState.hasVsl === 'yes' && wizardState.optin === 'yes') {
+    funnelType = 'Classic VSL';
+  } else if (wizardState.hasVsl === 'yes' && wizardState.optin === 'no') {
+    funnelType = 'Direct VSL';
+  } else if (wizardState.hasVsl === 'no' && wizardState.noVslNext === 'survey') {
+    funnelType = 'Direct Survey';
+  } else if (wizardState.hasVsl === 'no' && wizardState. noVslNext === 'booking') {
+    funnelType = 'Direct Booking';
+  } else {
+    funnelType = 'Funnel';
   }
+
+  if (funnelType) {
+    parts.push(funnelType);
+  }
+
+  // 3️⃣ Qualification
+  if (wizardState.surveyQuali === 'yes') {
+    parts.push('Quali');
+  }
+
+  // 4️⃣ Close Type
+  if (wizardState. closeType === '1-call') {
+    parts.push('1CC');
+  } else if (wizardState.closeType === '2-call') {
+    parts.push('2CC');
+  }
+
+  // 🔥 Name zusammenbauen mit " | " als Trenner
+  const suggestedName = parts.join(' | ');
+
+  const nameInput = document.getElementById('wizardFunnelName');
+  if (nameInput) {
+    nameInput.value = suggestedName;
+    wizardState.name = suggestedName;
+  }
+}
 
   // === Build Summary ===
   function buildSummary() {
