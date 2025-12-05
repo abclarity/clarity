@@ -456,11 +456,26 @@ function handleMouseDown(e) {
   }
 
   function handleMouseUp(e) {
-    dragState.isMouseDown = false;
-    dragState.isDragging = false;
-    dragState.startCell = null;
-    dragState.boundary = null;
+  if (!dragState.isMouseDown) return;
+
+  const td = dragState.startCell;
+
+  // 🔥 KEIN Drag passiert → normaler Click
+  if (!dragState.isDragging && td && isSelectableCell(td)) {
+    // Clear alte Selektion und wähle nur diese Zelle
+    clearAllSelections();
+    selectCell(td, false);
   }
+
+  // 🔥 Drag passiert → Selektion bleibt! 
+  // (nichts tun, selectedCells bleibt wie es ist)
+
+  // Reset Drag State
+  dragState.isMouseDown = false;
+  dragState.isDragging = false;
+  dragState.startCell = null;
+  dragState.boundary = null;
+}
 
   // === Keyboard Handling ===
   function setupKeyboardHandling() {
