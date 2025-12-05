@@ -1885,7 +1885,7 @@ tr[data-quarter] td.calc {
 td.cell-selected {
   outline: 2px solid #1877f2 !important;
   outline-offset: -2px;
-  background: #e3f2fd !important;
+  background: #bbdefb !important;
   position: relative;
 }
 
