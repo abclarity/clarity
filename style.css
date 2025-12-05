@@ -1889,6 +1889,22 @@ td.cell-selected {
   position: relative;
 }
 
+/* Readonly cells: nur blauer Rand, kein Hintergrund */
+td.cell-selected.calc,
+td.cell-selected.weekday,
+td.cell-selected.sunday-cell,
+th.cell-selected,
+tfoot td.cell-selected,
+#tracker tbody td.cell-selected:nth-child(1),
+#tracker tbody td.cell-selected:nth-child(2),
+tr[data-week] td.cell-selected,
+tr[data-quarter] td.cell-selected,
+#year-body td.cell-selected:first-child {
+  background: transparent !important;
+  outline: 2px solid #1877f2 !important;
+  outline-offset: -2px;
+}
+
 td.cell-editing {
   outline: 2px solid #1877f2 !important;
   outline-offset: -2px;

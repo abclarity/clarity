@@ -182,8 +182,7 @@
 
     setTimeout(() => {
       isExitingEditMode = false;
-      selectCell(td);
-    }, 100);
+    }, 150);
   }
 
   // === Get All Selectable Cells ===
@@ -268,9 +267,11 @@
 
     clearCopyState();
 
+    let hasCopiedAny = false;
+
     selectedCells.forEach(cell => {
       const input = cell.querySelector('input');
-      if (!input) return;
+      if (!input || !input.dataset.key) return;
 
       const key = input.dataset.key;
       const data = getCurrentMonthData();
@@ -279,6 +280,7 @@
       if (value !== undefined) {
         copiedCells.set(cell, { key, value });
         cell.classList.add('cell-copying');
+        hasCopiedAny = true;
       }
     });
   }
@@ -294,7 +296,7 @@
 
       selectedArray.forEach(targetCell => {
         const input = targetCell.querySelector('input');
-        if (!input) return;
+        if (!input || !input.dataset.key) return;
 
         pasteValueToCell(input, copiedData.value);
       });
@@ -308,7 +310,7 @@
         if (!targetCell) return;
 
         const input = targetCell.querySelector('input');
-        if (!input) return;
+        if (!input || !input.dataset.key) return;
 
         pasteValueToCell(input, copiedData.value);
       });
@@ -318,7 +320,7 @@
         if (!targetCell) return;
 
         const input = targetCell.querySelector('input');
-        if (!input) return;
+        if (!input || !input.dataset.key) return;
 
         pasteValueToCell(input, copiedData.value);
       });
@@ -412,21 +414,48 @@
 
     if (!canSelectTogether(dragState.startCell, td)) return;
 
-    const allCells = getAllSelectableCells();
-    const startIdx = allCells.indexOf(dragState.startCell);
-    const currentIdx = allCells.indexOf(td);
-
-    if (startIdx === -1 || currentIdx === -1) return;
-
-    const minIdx = Math.min(startIdx, currentIdx);
-    const maxIdx = Math.max(startIdx, currentIdx);
+    // Get column indices
+    const startRow = dragState.startCell.parentElement;
+    const currentRow = td.parentElement;
+    const startColIdx = Array.from(startRow.children).indexOf(dragState.startCell);
+    const currentColIdx = Array.from(currentRow.children).indexOf(td);
 
     clearAllSelections();
 
-    for (let i = minIdx; i <= maxIdx; i++) {
-      const cell = allCells[i];
-      if (getCellBoundary(cell) === dragState.boundary) {
-        selectCell(cell, true);
+    // Check if it's a vertical or horizontal drag
+    if (startColIdx === currentColIdx) {
+      // Vertical drag: same column
+      const rows = Array.from(dragState.startCell.closest('table').querySelectorAll('tr'));
+      const startRowIdx = rows.indexOf(startRow);
+      const currentRowIdx = rows.indexOf(currentRow);
+
+      const minRowIdx = Math.min(startRowIdx, currentRowIdx);
+      const maxRowIdx = Math.max(startRowIdx, currentRowIdx);
+
+      for (let i = minRowIdx; i <= maxRowIdx; i++) {
+        const row = rows[i];
+        if (!row) continue;
+        const cell = row.children[startColIdx];
+        if (cell && isSelectableCell(cell) && getCellBoundary(cell) === dragState.boundary) {
+          selectCell(cell, true);
+        }
+      }
+    } else {
+      // Horizontal drag or diagonal: select all cells in the rectangle
+      const allCells = getAllSelectableCells();
+      const startIdx = allCells.indexOf(dragState.startCell);
+      const currentIdx = allCells.indexOf(td);
+
+      if (startIdx === -1 || currentIdx === -1) return;
+
+      const minIdx = Math.min(startIdx, currentIdx);
+      const maxIdx = Math.max(startIdx, currentIdx);
+
+      for (let i = minIdx; i <= maxIdx; i++) {
+        const cell = allCells[i];
+        if (getCellBoundary(cell) === dragState.boundary) {
+          selectCell(cell, true);
+        }
       }
     }
   }
@@ -444,15 +473,26 @@
       if (editingCell) {
         if (e.key === 'Escape') {
           e.preventDefault();
+          const currentCell = editingCell;
           exitEditMode(false);
+          setTimeout(() => selectCell(currentCell), 160);
         } else if (e.key === 'Enter') {
           e.preventDefault();
+          const currentCell = editingCell;
           exitEditMode(true);
-          navigateToCell('down');
+          setTimeout(() => {
+            const nextCell = getAdjacentCell(currentCell, 'down');
+            if (nextCell) selectCell(nextCell);
+          }, 160);
         } else if (e.key === 'Tab') {
           e.preventDefault();
+          const currentCell = editingCell;
+          const direction = e.shiftKey ? 'prev' : 'next';
           exitEditMode(true);
-          navigateToCell(e.shiftKey ? 'prev' : 'next');
+          setTimeout(() => {
+            const nextCell = getAdjacentCell(currentCell, direction);
+            if (nextCell) selectCell(nextCell);
+          }, 160);
         }
         return;
       }
