@@ -47,6 +47,34 @@
       zoomArea.style.transformOrigin = "top left";
       zoomDisplay.textContent = zoomValue + "%";
       localStorage.setItem("globalZoom", zoomValue);
+
+      // 🔥 Container-Größe dynamisch anpassen, um Extra-Scroll zu verhindern
+      requestAnimationFrame(() => {
+        const wrapper = zoomArea.parentElement;
+        if (wrapper && wrapper.classList.contains('table-wrap')) {
+          // Hole die originale Größe des Inhalts (vor Scaling)
+          const table = zoomArea.querySelector('table');
+          if (table) {
+            const originalWidth = table.offsetWidth;
+            const originalHeight = table.offsetHeight;
+
+            // Berechne die tatsächliche Größe nach dem Scaling
+            const scaledWidth = originalWidth * scale;
+            const scaledHeight = originalHeight * scale;
+
+            // Setze die Wrapper-Größe auf die skalierte Größe
+            // Bei 100% oder mehr: Auto-Größe (normal responsive)
+            if (scale >= 1) {
+              wrapper.style.width = 'fit-content';
+              wrapper.style.height = 'auto';
+            } else {
+              // Bei weniger als 100%: Fixe Größe basierend auf Scale
+              wrapper.style.width = `${scaledWidth}px`;
+              wrapper.style.height = `${scaledHeight}px`;
+            }
+          }
+        }
+      });
     }
 
     if (btnIn) {

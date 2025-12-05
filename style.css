@@ -203,6 +203,8 @@ body {
   padding: 0 0 6px 0;
   margin: 0 0 12px 0;
   box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
 }
 
 table {
@@ -502,7 +504,7 @@ tr[data-quarter] td.calc {
   transform-origin: top left;
   transition: transform 0.2s ease;
   display: inline-block;
-  min-width: 100%;
+  width: fit-content;
 }
 
 /* ============================================
