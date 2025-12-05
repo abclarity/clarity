@@ -39,7 +39,7 @@
 
       container.innerHTML = `
         <div class="datapool-header">
-          <h1>💾 Datenpool</h1>
+          <h1>Datenpool</h1>
           <div class="datapool-actions">
             <button id="addLeadBtn" class="datapool-btn">
               ➕ Neuer Lead
