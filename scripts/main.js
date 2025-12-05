@@ -101,9 +101,9 @@
 
     const funnelButtons = funnels.map(funnel => {
       const isActive = funnel.id === activeFunnelId ? 'active' : '';
-      return `<button 
-        id="${funnel.id}Btn" 
-        class="funnel-btn ${isActive}" 
+      return `<button
+        id="${funnel.id}Btn"
+        class="funnel-btn ${isActive}"
         data-funnel-id="${funnel.id}"
         data-color="${funnel.color}"
         style="--funnel-color: ${funnel.color};"
@@ -117,16 +117,16 @@
             <button id="yearSelectBtn" class="year-btn">${currentYear}</button>
             <div id="yearDropdown" class="year-dropdown hidden"></div>
           </div>
-          <div class="header-separator"></div>
-          ${funnelButtons}
+          <div class="funnel-buttons-container">
+            ${funnelButtons}
+          </div>
           <button id="addFunnelBtn" class="add-funnel-btn" title="Neuen Funnel hinzufügen">+</button>
         </div>
+        <div class="header-separator"></div>
         <div class="right-header">
-          <div class="header-separator"></div>
           <button id="importDataBtn" class="import-btn" title="Daten importieren">
-            ⬆ UPLOAD
+            📥 Upload
           </button>
-          <div class="header-separator"></div>
           <div class="zoom-controls">
             <button id="zoomOut">−</button>
             <span id="zoomDisplay">100%</span>
@@ -521,16 +521,13 @@
     dash.classList.toggle("active", activeView === "year");
     tabsEl.appendChild(dash);
 
-    const sep = document.createElement("div");
-    sep.className = "tab-separator";
-    tabsEl.appendChild(sep);
+    const sep1 = document.createElement("div");
+    sep1.className = "tab-separator";
+    tabsEl.appendChild(sep1);
 
-    const addBtn = document.createElement("button");
-    addBtn.id = "addTab";
-    addBtn.className = "tab add";
-    addBtn.textContent = "+";
-    addBtn.addEventListener("click", addMonthFlow);
-    tabsEl.appendChild(addBtn);
+    const scrollContainer = document.createElement("div");
+    scrollContainer.className = "tabs-scroll-container";
+    scrollContainer.id = "tabsScrollContainer";
 
     const activeFunnel = FunnelAPI.getActiveFunnelData();
     const months = (activeFunnel.months || [])
@@ -558,8 +555,21 @@
         btn.classList.add("active");
       }
 
-      tabsEl.appendChild(btn);
+      scrollContainer.appendChild(btn);
     });
+
+    tabsEl.appendChild(scrollContainer);
+
+    const sep2 = document.createElement("div");
+    sep2.className = "tab-separator";
+    tabsEl.appendChild(sep2);
+
+    const addBtn = document.createElement("button");
+    addBtn.id = "addTab";
+    addBtn.className = "tab add";
+    addBtn.textContent = "+";
+    addBtn.addEventListener("click", addMonthFlow);
+    tabsEl.appendChild(addBtn);
   };
 
   function addMonthFlow() {

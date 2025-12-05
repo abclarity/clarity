@@ -74,9 +74,9 @@ body {
   justify-content: space-between;
   width: 100%;
   margin: 0 auto;
-  padding: 0 36px 0 0px;
+  padding: 0 20px 0 0;
   box-sizing: border-box;
-  max-width: calc(100% - 36px);
+  gap: 12px;
 }
 
 .left-header {
@@ -85,7 +85,9 @@ body {
   gap: 12px;
   margin: 0;
   padding: 0;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .right-header {
@@ -94,16 +96,61 @@ body {
   justify-content: flex-end;
   gap: 6px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
-/* Trennstrich im Header */
+/* Year-Select: FIXIERT */
+.year-select {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10000;
+}
+
+/* Scrollbarer Container für Funnel-Buttons */
+.funnel-buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  scroll-behavior: smooth;
+}
+
+.funnel-buttons-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.funnel-buttons-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.funnel-buttons-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.funnel-buttons-container::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Add-Funnel Button: FIXIERT */
+.add-funnel-btn {
+  flex-shrink: 0;
+}
+
+/* Trennstrich im Header: FIXIERT */
 .header-separator {
+  flex-shrink: 0;
   width: 1px;
   height: 28px;
   background: #d0d0d0;
   border-radius: 1px;
-  margin: 0 12px 0 12px;
-  flex-shrink: 0;
+  margin: 0 12px;
 }
 
 /* ============================================
@@ -126,11 +173,7 @@ body {
   white-space: nowrap;
   color: #333;
   height: auto;
-  margin-left: 8px;
-}
-
-.funnel-btn:first-of-type {
-  margin-left: 0;
+  flex-shrink: 0;
 }
 
 /* Normal Hover (benutzt CSS-Variable) */
@@ -672,24 +715,47 @@ tr[data-quarter] td.calc {
   display: flex;
   align-items: center;
   gap: 8px;
-  overflow-x: auto;
-  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
   padding-left: 22px;
   padding-right: 12px;
-  scroll-behavior: smooth;
 }
 
-#tabs::-webkit-scrollbar {
+/* Dashboard Tab: FIXIERT */
+#dashTab {
+  flex-shrink: 0 !important;
+}
+
+/* Scrollbarer Container für Monats-Tabs */
+.tabs-scroll-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+  scroll-behavior: smooth;
+  padding: 4px 0;
+}
+
+.tabs-scroll-container::-webkit-scrollbar {
   height: 6px;
 }
 
-#tabs::-webkit-scrollbar-thumb {
+.tabs-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabs-scroll-container::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 3px;
 }
 
-#tabs::-webkit-scrollbar-track {
-  background: transparent;
+.tabs-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .tab {
@@ -732,6 +798,7 @@ tr[data-quarter] td.calc {
   line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0 !important;
 }
 
 .tab.add:hover {
@@ -747,14 +814,14 @@ tr[data-quarter] td.calc {
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
-/* Trennlinie zwischen Dashboard und + */
+/* Separator: FIXIERT */
 .tab-separator {
+  flex-shrink: 0 !important;
   width: 1px;
   height: 28px;
   background: #d0d0d0;
   border-radius: 1px;
   margin: 0 2px 0 6px;
-  flex-shrink: 0;
 }
 
 /* ============================================
@@ -3379,5 +3446,52 @@ body:has(.app-sidebar.collapsed) .datapool-view {
 
   .datapool-table td {
     padding: 8px;
+  }
+
+  .header-bar {
+    padding: 0 12px 0 0;
+    gap: 8px;
+  }
+
+  .left-header {
+    gap: 8px;
+  }
+
+  .funnel-buttons-container {
+    gap: 6px;
+  }
+
+  .funnel-btn {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  .import-btn {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  .zoom-controls {
+    font-size: 13px;
+  }
+
+  .zoom-controls button {
+    width: 26px;
+    height: 26px;
+  }
+
+  #tabs {
+    padding-left: 12px;
+    padding-right: 8px;
+    gap: 6px;
+  }
+
+  .tabs-scroll-container {
+    gap: 6px;
+  }
+
+  .tab {
+    font-size: 13px;
+    padding: 5px 10px;
   }
 }
