@@ -23,7 +23,6 @@
       search: '',
       funnel: '',
       source: '',
-      country: '',
       dateFrom: '',
       dateTo: ''
     },
@@ -42,10 +41,10 @@
         <div class="datapool-header">
           <h1>💾 Datenpool</h1>
           <div class="datapool-actions">
-            <button id="addLeadBtn" class="btn-primary">
+            <button id="addLeadBtn" class="datapool-btn">
               ➕ Neuer Lead
             </button>
-            <button id="csvImportBtn" class="btn-secondary">
+            <button id="csvImportBtn" class="datapool-btn">
               📤 CSV Import
             </button>
           </div>
@@ -71,15 +70,11 @@
             <option value="">Alle Traffic Sources</option>
           </select>
 
-          <select id="countryFilter">
-            <option value="">Alle Länder</option>
-          </select>
-
           <input type="date" id="dateFromFilter" placeholder="Von" />
           <input type="date" id="dateToFilter" placeholder="Bis" />
 
-          <button id="applyFiltersBtn" class="btn-primary">Filtern</button>
-          <button id="resetFiltersBtn" class="btn-secondary">Zurücksetzen</button>
+          <button id="applyFiltersBtn" class="datapool-btn">Filtern</button>
+          <button id="resetFiltersBtn" class="datapool-btn">Zurücksetzen</button>
         </div>
 
         <div class="datapool-table-container">
@@ -146,13 +141,6 @@
       if (sourceFilter) {
         sourceFilter.addEventListener('change', (e) => {
           this.filters.source = e.target.value;
-        });
-      }
-
-      const countryFilter = document.getElementById('countryFilter');
-      if (countryFilter) {
-        countryFilter.addEventListener('change', (e) => {
-          this.filters.country = e.target.value;
         });
       }
 
@@ -289,7 +277,6 @@
         search: '',
         funnel: '',
         source: '',
-        country: '',
         dateFrom: '',
         dateTo: ''
       };
@@ -297,7 +284,6 @@
       document.getElementById('searchInput').value = '';
       document.getElementById('funnelFilter').value = '';
       document.getElementById('sourceFilter').value = '';
-      document.getElementById('countryFilter').value = '';
       document.getElementById('dateFromFilter').value = '';
       document.getElementById('dateToFilter').value = '';
 
@@ -341,10 +327,6 @@
 
         if (this.filters.source) {
           query = query.eq('source', this.filters.source);
-        }
-
-        if (this.filters.country) {
-          query = query.eq('leads.country', this.filters.country);
         }
 
         if (this.filters.dateFrom) {
@@ -427,26 +409,6 @@
             sourceFilter.appendChild(option);
           });
           sourceFilter.value = currentValue;
-        }
-
-        const { data: leadsData } = await window.SupabaseClient
-          .from('leads')
-          .select('country')
-          .not('country', 'is', null)
-          .neq('country', '');
-
-        const uniqueCountries = [...new Set(leadsData?.map(c => c.country) || [])];
-        const countryFilter = document.getElementById('countryFilter');
-        if (countryFilter) {
-          const currentValue = countryFilter.value;
-          countryFilter.innerHTML = '<option value="">Alle Länder</option>';
-          uniqueCountries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countryFilter.appendChild(option);
-          });
-          countryFilter.value = currentValue;
         }
       } catch (err) {
         console.error('❌ Error loading filter options:', err);
