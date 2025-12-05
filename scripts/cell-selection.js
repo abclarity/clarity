@@ -377,37 +377,39 @@
   }
 
   // === Drag Selection ===
-  function handleMouseDown(e) {
-    const td = e.target.closest('td');
-    if (!isSelectableCell(td)) return;
+function handleMouseDown(e) {
+  const td = e.target.closest('td');
+  if (!isSelectableCell(td)) return;
 
-    if (editingCell) return;
+  if (editingCell) return;
 
-    const isCmd = e.metaKey || e.ctrlKey;
-    const isShift = e.shiftKey;
+  const isCmd = e.metaKey || e.ctrlKey;
+  const isShift = e.shiftKey;
 
-    if (isShift && lastSelectedCell) {
-      e.preventDefault();
-      selectRange(lastSelectedCell, td);
-      return;
-    }
-
-    if (isCmd) {
-      e.preventDefault();
-      toggleCell(td);
-    } else {
-      e.preventDefault();
-      // Don't clear selections yet - wait to see if it's a drag
-      if (!selectedCells.has(td)) {
-        clearAllSelections();
-        selectCell(td, true);
-      }
-    }
-
-    dragState.isMouseDown = true;
-    dragState.startCell = td;
-    dragState.boundary = getCellBoundary(td);
+  // Shift+Click: Range-Selection
+  if (isShift && lastSelectedCell) {
+    e.preventDefault();
+    selectRange(lastSelectedCell, td);
+    dragState.isMouseDown = false;  // 🔥 Kein Drag nach Shift+Click
+    return;
   }
+
+  // Cmd+Click: Toggle einzelne Zelle
+  if (isCmd) {
+    e. preventDefault();
+    toggleCell(td);
+    dragState.isMouseDown = false;  // 🔥 Kein Drag nach Cmd+Click
+    return;
+  }
+
+  // Normaler Click: Warte auf mouseup/mousemove
+  e.preventDefault();
+  
+  dragState.isMouseDown = true;
+  dragState.isDragging = false;
+  dragState.startCell = td;
+  dragState.boundary = getCellBoundary(td);
+}
 
   function handleMouseMove(e) {
     if (!dragState.isMouseDown || editingCell) return;
