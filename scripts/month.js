@@ -127,7 +127,6 @@
             const rawValue = data[key];
 
             if (typeof rawValue === "number") {
-              // Zeige den Roh-Wert mit deutschem Format (Komma statt Punkt)
               e.target.value = rawValue.toString().replace(".", ",");
             }
           });
@@ -153,25 +152,15 @@
               return;
             }
 
-            // Speichere den Wert
             const data = StorageAPI.loadMonthDataForFunnel(activeFunnelId, y, mIdx);
             data[key] = num;
             StorageAPI.saveMonthDataForFunnel(activeFunnelId, y, mIdx, data);
 
-            // Formatiere die Anzeige
             e.target.value = ["Adspend", "Revenue", "Cash"].includes(col)
               ? euro.format(num)
               : int0.format(num);
 
             calcAllRows(y, mIdx, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
-          });
-
-          // 🔥 ENTER: Speichere und gehe weiter
-          input.addEventListener("keydown", e => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              e.target.blur();
-            }
           });
 
           // 🔥 INPUT: Live-Update (während Tippen)
@@ -199,10 +188,15 @@
                 StorageAPI.saveMonthDataForFunnel(activeFunnelId, y, mIdx, data);
                 calcAllRows(y, mIdx, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
               }
-            }, 300); // 300ms Debounce
+            }, 300);
           });
 
           td.appendChild(input);
+
+          // 🔥 Setup Cell Selection (Google Sheets behavior)
+          if (window.CellSelection) {
+            window.CellSelection.setupCell(td, input);
+          }
         }
         else {
           td.textContent = "–";
@@ -217,6 +211,10 @@
     }
 
     addWeeklySection(ALL_COLUMNS, INPUT_KEYS, KPI_COLS);
+
+    // Store params for recalculation (needed for Copy/Paste)
+    setCurrentMonthParams(y, mIdx, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
+
     calcAllRows(y, mIdx, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
 
     // Zoom initialisieren
@@ -453,5 +451,26 @@
   }
 
 
-  window.MonthView = { loadMonth };
+  // === Export recalculate function for Copy/Paste ===
+  let currentMonthParams = null;
+
+  function setCurrentMonthParams(y, mIdx, cols, inputs, kpis, funnelId) {
+    currentMonthParams = { y, mIdx, cols, inputs, kpis, funnelId };
+  }
+
+  function recalculate() {
+    if (!currentMonthParams) return;
+    const { y, mIdx, cols, inputs, kpis, funnelId } = currentMonthParams;
+    calcAllRows(y, mIdx, cols, inputs, kpis, funnelId);
+  }
+
+  // Store params when loading month
+  function loadMonthWrapper(y, mIdx) {
+    loadMonth(y, mIdx);
+  }
+
+  window.MonthView = {
+    loadMonth: loadMonthWrapper,
+    recalculate
+  };
 })(window);
