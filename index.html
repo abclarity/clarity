@@ -9,6 +9,9 @@
 
   <!-- 🔥 Papa Parse (CSV-Parser) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -607,9 +610,22 @@
   <script src="scripts/modules.js"></script>
   <script src="scripts/month.js"></script>
   <script src="scripts/year.js"></script>
+  <script src="scripts/supabase-client.js"></script>
+  <script src="scripts/sidebar.js"></script>
+  <script src="scripts/datapool.js"></script>
+  <script src="scripts/csv-import-datapool.js"></script>
+  <script src="scripts/api-settings.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/import.js"></script>
   <script src="scripts/wizard.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.SidebarAPI) {
+        window.SidebarAPI.init();
+      }
+    });
+  </script>
 
   <!-- Versteckter File-Input -->
   <input type="file" id="csvFileInput" accept=".csv" style="display: none;" />
