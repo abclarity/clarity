@@ -1885,7 +1885,7 @@ tr[data-quarter] td.calc {
 td.cell-selected {
   outline: 2px solid #1877f2 !important;
   outline-offset: -2px;
-  background: #bbdefb !important;
+  background: #e3f2fd !important;
   position: relative;
 }
 
@@ -1909,7 +1909,8 @@ tfoot td.cell-selected,
 #tracker tbody td.cell-selected:nth-child(2),
 tr[data-week] td.cell-selected,
 tr[data-quarter] td.cell-selected,
-#year-body td.cell-selected:first-child {
+#year-body td.cell-selected:first-child,
+#year-summary td.cell-selected {
   background: inherit !important;
   outline: 2px solid #1877f2 !important;
   outline-offset: -2px;
