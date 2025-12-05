@@ -105,9 +105,6 @@
 
   function copySelectedCells() {
     if (selectedCells.length === 0) {
-      if (window.Toast) {
-        window.Toast.info('Keine Zellen ausgewählt');
-      }
       return;
     }
 
@@ -127,26 +124,14 @@
         cell.classList.remove('cell-copying');
       });
     }, 800);
-
-    if (window.Toast) {
-      window.Toast.success(`${copiedData.length} Zellen kopiert`);
-    }
-
-    console.log('📋 Kopiert:', copiedData);
   }
 
   function pasteToSelectedCells() {
     if (!copiedData || copiedData.length === 0) {
-      if (window.Toast) {
-        window.Toast.warning('Keine Daten zum Einfügen vorhanden');
-      }
       return;
     }
 
     if (selectedCells.length === 0) {
-      if (window.Toast) {
-        window.Toast.warning('Keine Zellen ausgewählt');
-      }
       return;
     }
 
@@ -168,13 +153,7 @@
       }
     }
 
-    if (window.Toast) {
-      window.Toast.success(`${pastedCount} Werte eingefügt`);
-    }
-
     clearSelection();
-
-    console.log('📋 Eingefügt:', pastedCount, 'Werte');
   }
 
   window.Clipboard = {

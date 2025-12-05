@@ -1889,10 +1889,20 @@ td.cell-selected {
   position: relative;
 }
 
-/* Readonly cells: nur blauer Rand, kein Hintergrund */
-td.cell-selected.calc,
+/* Readonly cells: nur blauer Rand, kein blaues Background-Overlay */
+td.cell-selected.calc {
+  background: var(--formula-bg) !important;
+  outline: 2px solid #1877f2 !important;
+  outline-offset: -2px;
+}
+
+td.cell-selected.sunday-cell {
+  background: #dc8c37 !important;
+  outline: 2px solid #1877f2 !important;
+  outline-offset: -2px;
+}
+
 td.cell-selected.weekday,
-td.cell-selected.sunday-cell,
 th.cell-selected,
 tfoot td.cell-selected,
 #tracker tbody td.cell-selected:nth-child(1),
@@ -1900,7 +1910,7 @@ tfoot td.cell-selected,
 tr[data-week] td.cell-selected,
 tr[data-quarter] td.cell-selected,
 #year-body td.cell-selected:first-child {
-  background: transparent !important;
+  background: inherit !important;
   outline: 2px solid #1877f2 !important;
   outline-offset: -2px;
 }

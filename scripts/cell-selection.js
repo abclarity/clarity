@@ -393,7 +393,11 @@
       toggleCell(td);
     } else {
       e.preventDefault();
-      selectCell(td);
+      // Don't clear selections yet - wait to see if it's a drag
+      if (!selectedCells.has(td)) {
+        clearAllSelections();
+        selectCell(td, true);
+      }
     }
 
     dragState.isMouseDown = true;
@@ -414,46 +418,31 @@
 
     if (!canSelectTogether(dragState.startCell, td)) return;
 
-    // Get column indices
+    // Get column and row indices
     const startRow = dragState.startCell.parentElement;
     const currentRow = td.parentElement;
     const startColIdx = Array.from(startRow.children).indexOf(dragState.startCell);
     const currentColIdx = Array.from(currentRow.children).indexOf(td);
 
+    const rows = Array.from(dragState.startCell.closest('table').querySelectorAll('tr'));
+    const startRowIdx = rows.indexOf(startRow);
+    const currentRowIdx = rows.indexOf(currentRow);
+
     clearAllSelections();
 
-    // Check if it's a vertical or horizontal drag
-    if (startColIdx === currentColIdx) {
-      // Vertical drag: same column
-      const rows = Array.from(dragState.startCell.closest('table').querySelectorAll('tr'));
-      const startRowIdx = rows.indexOf(startRow);
-      const currentRowIdx = rows.indexOf(currentRow);
+    // Rectangle selection: select all cells in the bounding box
+    const minRowIdx = Math.min(startRowIdx, currentRowIdx);
+    const maxRowIdx = Math.max(startRowIdx, currentRowIdx);
+    const minColIdx = Math.min(startColIdx, currentColIdx);
+    const maxColIdx = Math.max(startColIdx, currentColIdx);
 
-      const minRowIdx = Math.min(startRowIdx, currentRowIdx);
-      const maxRowIdx = Math.max(startRowIdx, currentRowIdx);
+    for (let rowIdx = minRowIdx; rowIdx <= maxRowIdx; rowIdx++) {
+      const row = rows[rowIdx];
+      if (!row) continue;
 
-      for (let i = minRowIdx; i <= maxRowIdx; i++) {
-        const row = rows[i];
-        if (!row) continue;
-        const cell = row.children[startColIdx];
+      for (let colIdx = minColIdx; colIdx <= maxColIdx; colIdx++) {
+        const cell = row.children[colIdx];
         if (cell && isSelectableCell(cell) && getCellBoundary(cell) === dragState.boundary) {
-          selectCell(cell, true);
-        }
-      }
-    } else {
-      // Horizontal drag or diagonal: select all cells in the rectangle
-      const allCells = getAllSelectableCells();
-      const startIdx = allCells.indexOf(dragState.startCell);
-      const currentIdx = allCells.indexOf(td);
-
-      if (startIdx === -1 || currentIdx === -1) return;
-
-      const minIdx = Math.min(startIdx, currentIdx);
-      const maxIdx = Math.max(startIdx, currentIdx);
-
-      for (let i = minIdx; i <= maxIdx; i++) {
-        const cell = allCells[i];
-        if (getCellBoundary(cell) === dragState.boundary) {
           selectCell(cell, true);
         }
       }
