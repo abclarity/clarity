@@ -87,9 +87,13 @@
   // === Selection Functions ===
   function isSelectableCell(td) {
     if (!td || !td.tagName) return false;
-    if (td.tagName !== 'TD' && td.tagName !== 'TH') return false;
-    if (td.colSpan > 1 && td.rowSpan > 1) return false;
-    return true;
+    if (td.tagName !== 'TD') return false;
+
+    if (td.querySelector('input')) return true;
+    if (td.classList.contains('calc')) return true;
+    if (td.closest('tfoot')) return true;
+
+    return false;
   }
 
   function selectCell(td, addToSelection = false) {
@@ -528,6 +532,7 @@
     if (!td) return;
 
     td.addEventListener('click', (e) => {
+      if (!isSelectableCell(td)) return;
       if (editingCell === td || isExitingEditMode) return;
 
       e.preventDefault();
