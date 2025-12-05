@@ -25,6 +25,9 @@
       return raw ? JSON.parse(raw) : {};
     } catch (err) {
       console.error("❌ Fehler beim Laden von Monatsdaten:", err);
+      if (window.Toast) {
+        window.Toast.error('Fehler beim Laden der Monatsdaten');
+      }
       return {};
     }
   }
@@ -36,7 +39,13 @@
       localStorage.setItem(key, JSON.stringify(obj || {}));
     } catch (err) {
       console.error("❌ Fehler beim Speichern:", err);
-      alert("⚠️ Daten konnten nicht gespeichert werden (Speicher voll?)");
+      if (window.Toast) {
+        if (err.name === 'QuotaExceededError') {
+          window.Toast.error('Speicher voll! Bitte lösche Browser-Cache oder alte Monate.');
+        } else {
+          window.Toast.error('Fehler beim Speichern der Daten');
+        }
+      }
     }
   }
 
@@ -57,6 +66,9 @@
       return raw ? JSON.parse(raw) : {};
     } catch (err) {
       console.error("❌ Fehler beim Laden von Funnel-Monatsdaten:", err);
+      if (window.Toast) {
+        window.Toast.error('Fehler beim Laden der Funnel-Daten');
+      }
       return {};
     }
   }
@@ -68,7 +80,13 @@
       localStorage.setItem(key, JSON.stringify(obj || {}));
     } catch (err) {
       console.error("❌ Fehler beim Speichern:", err);
-      alert("⚠️ Daten konnten nicht gespeichert werden (Speicher voll?)");
+      if (window.Toast) {
+        if (err.name === 'QuotaExceededError') {
+          window.Toast.error('Speicher voll! Bitte lösche Browser-Cache oder alte Monate.');
+        } else {
+          window.Toast.error('Fehler beim Speichern der Funnel-Daten');
+        }
+      }
     }
   }
 

@@ -253,7 +253,9 @@
 
       const name = nameInput.value.trim();
       if (!name) {
-        alert('Bitte gib einen Namen ein!');
+        if (window.Toast) {
+          window.Toast.warning('Bitte gib einen Namen ein!');
+        }
         return;
       }
 
@@ -274,7 +276,9 @@
 
       const preset = FunnelAPI.getFunnelPreset(presetId);
       if (!preset) {
-        alert('Template nicht gefunden!');
+        if (window.Toast) {
+          window.Toast.error('Template nicht gefunden!');
+        }
         return;
       }
 
@@ -311,6 +315,10 @@
       });
 
       console.log('✅ Neuer Funnel erstellt:', newFunnel);
+
+      if (window.Toast) {
+        window.Toast.success(`Funnel "${name}" erfolgreich erstellt!`);
+      }
 
       modal.classList.add('hidden');
       switchToFunnel(newFunnel.id);
@@ -722,7 +730,9 @@
 
       const newName = input.value.trim();
       if (!newName) {
-        alert("Bitte gib einen Namen ein!");
+        if (window.Toast) {
+          window.Toast.warning("Bitte gib einen Namen ein!");
+        }
         return;
       }
 
@@ -733,6 +743,10 @@
       buildGlobalHeader(window.activeYear);
       setupFunnelButtons();
       setupAddFunnelButton();
+
+      if (window.Toast) {
+        window.Toast.success(`Funnel umbenannt in "${newName}"`);
+      }
 
       console.log(`✅ Funnel umbenannt: ${contextFunnelId} → ${newName}`);
     };
@@ -779,6 +793,10 @@
       setupFunnelButtons();
       setupAddFunnelButton();
 
+      if (window.Toast) {
+        window.Toast.success('Farbe erfolgreich geändert');
+      }
+
       console.log(`✅ Farbe geändert: ${contextFunnelId} → ${selectedColor}`);
     };
 
@@ -794,7 +812,9 @@
     if (!funnel) return;
 
     if (funnels.length <= 1) {
-      alert("⚠️ Du kannst den letzten Funnel nicht löschen!");
+      if (window.Toast) {
+        window.Toast.warning("Du kannst den letzten Funnel nicht löschen!");
+      }
       funnelMenu.style.display = "none";
       return;
     }
@@ -846,6 +866,10 @@
         buildGlobalHeader(window.activeYear);
         setupFunnelButtons();
         setupAddFunnelButton();
+      }
+
+      if (window.Toast) {
+        window.Toast.success('Funnel erfolgreich gelöscht');
       }
 
       console.log(`✅ Funnel gelöscht: ${contextFunnelId}`);

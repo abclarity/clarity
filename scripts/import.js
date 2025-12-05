@@ -183,7 +183,9 @@
 
     const activeFunnel = FunnelAPI.getActiveFunnelData();
     if (!activeFunnel) {
-      alert('⚠️ Kein aktiver Funnel!   Bitte erstelle zuerst einen Funnel.');
+      if (window.Toast) {
+        window.Toast.warning('Kein aktiver Funnel! Bitte erstelle zuerst einen Funnel.');
+      }
       return;
     }
 
@@ -255,10 +257,18 @@
       selectedFile = file;
       document.getElementById('selectedFileName').textContent = `📄 ${file.name}`;
 
+      if (window.Loading) {
+        window.Loading.show('CSV wird gelesen...');
+      }
+
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
+          if (window.Loading) {
+            window.Loading.hide();
+          }
+
           parsedData = results.data;
           console.log('✅ CSV geparsed:', parsedData);
 
@@ -268,13 +278,23 @@
             populateMonthSelect(detectedMonth);
             monthSelectWrapper.style.display = 'block';
             nextBtn.disabled = false;
+            if (window.Toast) {
+              window.Toast.success('CSV erfolgreich geladen');
+            }
           } else {
-            alert('❌ Kein gültiges Datum in der CSV gefunden!');
+            if (window.Toast) {
+              window.Toast.error('Kein gültiges Datum in der CSV gefunden!');
+            }
             nextBtn.disabled = true;
           }
         },
         error: (error) => {
-          alert('❌ Fehler beim Lesen der CSV-Datei:\n' + error.message);
+          if (window.Loading) {
+            window.Loading.hide();
+          }
+          if (window.Toast) {
+            window.Toast.error('Fehler beim Lesen der CSV-Datei: ' + error.message);
+          }
           nextBtn.disabled = true;
         }
       });
@@ -451,18 +471,24 @@
 
   // === Perform Import ===
   function performImport(mode) {
-    const activeFunnelId = FunnelAPI.getActiveFunnel();
-    let existingData = StorageAPI.loadMonthDataForFunnel(activeFunnelId, selectedYear, selectedMonth);
-
-    if (mode === 'overwrite') {
-      existingData = {};
+    if (window.Loading) {
+      window.Loading.show('Daten werden importiert...');
     }
 
-    let importedDays = 0;
-    let importedColumns = new Set();
-    let skippedRows = 0;
+    setTimeout(() => {
+      try {
+        const activeFunnelId = FunnelAPI.getActiveFunnel();
+        let existingData = StorageAPI.loadMonthDataForFunnel(activeFunnelId, selectedYear, selectedMonth);
 
-    parsedData.forEach(row => {
+        if (mode === 'overwrite') {
+          existingData = {};
+        }
+
+        let importedDays = 0;
+        let importedColumns = new Set();
+        let skippedRows = 0;
+
+        parsedData.forEach(row => {
       const datumCsvCol = columnMapping['Datum'];
       const dateStr = datumCsvCol ? row[datumCsvCol] : null;
       if (!dateStr) {
@@ -502,23 +528,41 @@
       });
     });
 
-    StorageAPI.saveMonthDataForFunnel(activeFunnelId, selectedYear, selectedMonth, existingData);
+        StorageAPI.saveMonthDataForFunnel(activeFunnelId, selectedYear, selectedMonth, existingData);
 
-    if (window.calcAllRows) {
-      const ALL_COLUMNS = window.ALL_COLUMNS || [];
-      const INPUT_KEYS = window.INPUT_KEYS || [];
-      const KPI_COLS = window.KPI_COLS || [];
-      window.calcAllRows(selectedYear, selectedMonth, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
-    }
+        if (window.calcAllRows) {
+          const ALL_COLUMNS = window.ALL_COLUMNS || [];
+          const INPUT_KEYS = window.INPUT_KEYS || [];
+          const KPI_COLS = window.KPI_COLS || [];
+          window.calcAllRows(selectedYear, selectedMonth, ALL_COLUMNS, INPUT_KEYS, KPI_COLS, activeFunnelId);
+        }
 
-    showImportSummary(importedDays, importedColumns, skippedRows);
-    showStep(4);
+        if (window.Loading) {
+          window.Loading.hide();
+        }
 
-    if (window.switchToMonth) {
-      setTimeout(() => {
-        window.switchToMonth(selectedYear, selectedMonth);
-      }, 500);
-    }
+        if (window.Toast) {
+          window.Toast.success(`${importedDays} Tage erfolgreich importiert!`);
+        }
+
+        showImportSummary(importedDays, importedColumns, skippedRows);
+        showStep(4);
+
+        if (window.switchToMonth) {
+          setTimeout(() => {
+            window.switchToMonth(selectedYear, selectedMonth);
+          }, 500);
+        }
+      } catch (err) {
+        if (window.Loading) {
+          window.Loading.hide();
+        }
+        if (window.Toast) {
+          window.Toast.error('Fehler beim Importieren: ' + err.message);
+        }
+        console.error('Import error:', err);
+      }
+    }, 100);
   }
 
   // === Show Import Summary ===
