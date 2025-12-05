@@ -3,13 +3,18 @@
   const ITEMS_PER_PAGE = 50;
 
   const DataPool = {
-    currentFilters: {
-      leads: {},
-      surveys: {},
-      surveyQualis: {},
-      bookings: {},
-      units: {}
+    currentPage: 1,
+    totalLeads: 0,
+    filters: {
+      search: '',
+      funnel: '',
+      source: '',
+      country: '',
+      dateFrom: '',
+      dateTo: ''
     },
+    sortBy: 'created_at',
+    sortOrder: 'desc',
 
     async init() {
       console.log('🔧 Initializing DataPool...');
@@ -23,422 +28,678 @@
         <div class="datapool-header">
           <h1>💾 Datenpool</h1>
           <div class="datapool-actions">
-            <button id="syncNowBtn" class="btn-primary">
-              🔄 Jetzt synchronisieren
+            <button id="addLeadBtn" class="btn-primary">
+              ➕ Neuer Lead
             </button>
             <button id="csvImportBtn" class="btn-secondary">
               📤 CSV Import
             </button>
-            <button id="settingsBtn" class="btn-secondary">
-              ⚙️ Einstellungen
-            </button>
           </div>
         </div>
 
-        <div class="datapool-stats">
-          <div class="stat-card">
-            <div class="stat-value" id="totalLeads">-</div>
-            <div class="stat-label">Gesamt Leads</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="todayEvents">-</div>
-            <div class="stat-label">Events heute</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="lastSync">-</div>
-            <div class="stat-label">Letzte Sync</div>
-          </div>
+        <div class="datapool-filters">
+          <input type="text" id="searchInput" placeholder="Suche nach Name, E-Mail oder Telefon..." />
+
+          <select id="funnelFilter">
+            <option value="">Alle Funnels</option>
+          </select>
+
+          <select id="sourceFilter">
+            <option value="">Alle Traffic Sources</option>
+          </select>
+
+          <select id="countryFilter">
+            <option value="">Alle Länder</option>
+          </select>
+
+          <input type="date" id="dateFromFilter" placeholder="Von" />
+          <input type="date" id="dateToFilter" placeholder="Bis" />
+
+          <button id="applyFiltersBtn" class="btn-primary">Filtern</button>
+          <button id="resetFiltersBtn" class="btn-secondary">Zurücksetzen</button>
         </div>
 
-        <div class="datapool-content">
-          <div class="event-card">
-            <div class="event-card-header">
-              <h3>📧 Leads</h3>
-              <button class="btn-filter" data-event="leads">🔍 Filter</button>
-            </div>
-            <div class="event-filter hidden" id="filter-leads"></div>
-            <div class="event-list" id="list-leads">
-              <div class="loading-spinner">Laden...</div>
-            </div>
-            <button class="btn-load-more hidden" data-event="leads">Mehr laden</button>
-          </div>
+        <div class="datapool-table-container">
+          <table class="datapool-table">
+            <thead>
+              <tr>
+                <th data-sort="name">Name ▼</th>
+                <th data-sort="primary_email">E-Mail ▼</th>
+                <th data-sort="primary_phone">Telefon ▼</th>
+                <th data-sort="source">Traffic Source ▼</th>
+                <th data-sort="utm_campaign">UTM Campaign ▼</th>
+                <th data-sort="country">Land ▼</th>
+                <th data-sort="funnel_id">Funnel ▼</th>
+                <th data-sort="created_at">Erstellt am ▼</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <tr>
+                <td colspan="9" class="loading-cell">Laden...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div class="event-card">
-            <div class="event-card-header">
-              <h3>📋 Surveys</h3>
-              <button class="btn-filter" data-event="surveys">🔍 Filter</button>
-            </div>
-            <div class="event-filter hidden" id="filter-surveys"></div>
-            <div class="event-list" id="list-surveys">
-              <div class="loading-spinner">Laden...</div>
-            </div>
-            <button class="btn-load-more hidden" data-event="surveys">Mehr laden</button>
-          </div>
-
-          <div class="event-card">
-            <div class="event-card-header">
-              <h3>✅ Survey Qualis</h3>
-              <button class="btn-filter" data-event="surveyQualis">🔍 Filter</button>
-            </div>
-            <div class="event-filter hidden" id="filter-surveyQualis"></div>
-            <div class="event-list" id="list-surveyQualis">
-              <div class="loading-spinner">Laden...</div>
-            </div>
-            <button class="btn-load-more hidden" data-event="surveyQualis">Mehr laden</button>
-          </div>
-
-          <div class="event-card">
-            <div class="event-card-header">
-              <h3>📅 Call Bookings</h3>
-              <button class="btn-filter" data-event="bookings">🔍 Filter</button>
-            </div>
-            <div class="event-filter hidden" id="filter-bookings"></div>
-            <div class="event-list" id="list-bookings">
-              <div class="loading-spinner">Laden...</div>
-            </div>
-            <button class="btn-load-more hidden" data-event="bookings">Mehr laden</button>
-          </div>
-
-          <div class="event-card">
-            <div class="event-card-header">
-              <h3>💰 Units</h3>
-              <button class="btn-filter" data-event="units">🔍 Filter</button>
-            </div>
-            <div class="event-filter hidden" id="filter-units"></div>
-            <div class="event-list" id="list-units">
-              <div class="loading-spinner">Laden...</div>
-            </div>
-            <button class="btn-load-more hidden" data-event="units">Mehr laden</button>
-          </div>
+        <div class="datapool-pagination">
+          <button id="prevPageBtn" class="btn-secondary" disabled>← Zurück</button>
+          <span id="pageInfo">Seite 1</span>
+          <button id="nextPageBtn" class="btn-secondary">Weiter →</button>
         </div>
       `;
 
+      await this.loadFunnelOptions();
       this.attachListeners();
-      await this.loadStats();
-      await this.loadAllEvents();
+      await this.loadLeads();
+    },
+
+    async loadFunnelOptions() {
+      const funnels = FunnelAPI.loadFunnels();
+      const funnelFilter = document.getElementById('funnelFilter');
+      if (funnelFilter) {
+        funnels.forEach(funnel => {
+          const option = document.createElement('option');
+          option.value = funnel.id;
+          option.textContent = funnel.name;
+          funnelFilter.appendChild(option);
+        });
+      }
     },
 
     attachListeners() {
-      document.querySelectorAll('.btn-filter').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const eventType = e.target.dataset.event;
-          this.toggleFilter(eventType);
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          this.filters.search = e.target.value;
         });
-      });
+      }
 
-      document.querySelectorAll('.btn-load-more').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const eventType = e.target.dataset.event;
-          this.loadMore(eventType);
+      const funnelFilter = document.getElementById('funnelFilter');
+      if (funnelFilter) {
+        funnelFilter.addEventListener('change', (e) => {
+          this.filters.funnel = e.target.value;
         });
-      });
+      }
+
+      const sourceFilter = document.getElementById('sourceFilter');
+      if (sourceFilter) {
+        sourceFilter.addEventListener('change', (e) => {
+          this.filters.source = e.target.value;
+        });
+      }
+
+      const countryFilter = document.getElementById('countryFilter');
+      if (countryFilter) {
+        countryFilter.addEventListener('change', (e) => {
+          this.filters.country = e.target.value;
+        });
+      }
+
+      const dateFromFilter = document.getElementById('dateFromFilter');
+      if (dateFromFilter) {
+        dateFromFilter.addEventListener('change', (e) => {
+          this.filters.dateFrom = e.target.value;
+        });
+      }
+
+      const dateToFilter = document.getElementById('dateToFilter');
+      if (dateToFilter) {
+        dateToFilter.addEventListener('change', (e) => {
+          this.filters.dateTo = e.target.value;
+        });
+      }
+
+      const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+      if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => {
+          this.currentPage = 1;
+          this.loadLeads();
+        });
+      }
+
+      const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+      if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', () => {
+          this.resetFilters();
+        });
+      }
+
+      const prevPageBtn = document.getElementById('prevPageBtn');
+      if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => {
+          if (this.currentPage > 1) {
+            this.currentPage--;
+            this.loadLeads();
+          }
+        });
+      }
+
+      const nextPageBtn = document.getElementById('nextPageBtn');
+      if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+          this.currentPage++;
+          this.loadLeads();
+        });
+      }
+
+      const addLeadBtn = document.getElementById('addLeadBtn');
+      if (addLeadBtn) {
+        addLeadBtn.addEventListener('click', () => {
+          this.openAddLeadModal();
+        });
+      }
 
       const csvImportBtn = document.getElementById('csvImportBtn');
       if (csvImportBtn) {
-        csvImportBtn.addEventListener('click', () => this.openCSVImport());
+        csvImportBtn.addEventListener('click', () => {
+          this.openCSVImport();
+        });
       }
 
-      const settingsBtn = document.getElementById('settingsBtn');
-      if (settingsBtn) {
-        settingsBtn.addEventListener('click', () => this.openSettings());
-      }
+      document.querySelectorAll('.datapool-table th[data-sort]').forEach(th => {
+        th.addEventListener('click', (e) => {
+          const sortField = e.target.dataset.sort;
+          if (this.sortBy === sortField) {
+            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+          } else {
+            this.sortBy = sortField;
+            this.sortOrder = 'asc';
+          }
+          this.currentPage = 1;
+          this.updateSortIcons();
+          this.loadLeads();
+        });
+      });
+    },
 
-      const syncNowBtn = document.getElementById('syncNowBtn');
-      if (syncNowBtn) {
-        syncNowBtn.addEventListener('click', () => this.syncNow());
+    updateSortIcons() {
+      document.querySelectorAll('.datapool-table th[data-sort]').forEach(th => {
+        const sortField = th.dataset.sort;
+        const text = th.textContent.replace(' ▼', '').replace(' ▲', '');
+        if (this.sortBy === sortField) {
+          th.textContent = text + (this.sortOrder === 'asc' ? ' ▲' : ' ▼');
+        } else {
+          th.textContent = text + ' ▼';
+        }
+      });
+    },
+
+    resetFilters() {
+      this.filters = {
+        search: '',
+        funnel: '',
+        source: '',
+        country: '',
+        dateFrom: '',
+        dateTo: ''
+      };
+
+      document.getElementById('searchInput').value = '';
+      document.getElementById('funnelFilter').value = '';
+      document.getElementById('sourceFilter').value = '';
+      document.getElementById('countryFilter').value = '';
+      document.getElementById('dateFromFilter').value = '';
+      document.getElementById('dateToFilter').value = '';
+
+      this.currentPage = 1;
+      this.loadLeads();
+    },
+
+    async loadLeads() {
+      const tbody = document.getElementById('leadsTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '<tr><td colspan="9" class="loading-cell">Laden...</td></tr>';
+
+      try {
+        let query = window.SupabaseClient
+          .from('leads')
+          .select('*', { count: 'exact' });
+
+        if (this.filters.funnel) {
+          query = query.eq('funnel_id', this.filters.funnel);
+        }
+
+        if (this.filters.source) {
+          query = query.eq('source', this.filters.source);
+        }
+
+        if (this.filters.country) {
+          query = query.eq('country', this.filters.country);
+        }
+
+        if (this.filters.dateFrom) {
+          query = query.gte('created_at', this.filters.dateFrom);
+        }
+
+        if (this.filters.dateTo) {
+          query = query.lte('created_at', this.filters.dateTo + 'T23:59:59');
+        }
+
+        if (this.filters.search) {
+          query = query.or(`name.ilike.%${this.filters.search}%,primary_email.ilike.%${this.filters.search}%,primary_phone.ilike.%${this.filters.search}%`);
+        }
+
+        query = query.order(this.sortBy, { ascending: this.sortOrder === 'asc' });
+
+        const offset = (this.currentPage - 1) * ITEMS_PER_PAGE;
+        query = query.range(offset, offset + ITEMS_PER_PAGE - 1);
+
+        const { data, error, count } = await query;
+
+        if (error) {
+          console.error('❌ Error loading leads:', error);
+          tbody.innerHTML = '<tr><td colspan="9" class="error-cell">Fehler beim Laden der Daten</td></tr>';
+          return;
+        }
+
+        this.totalLeads = count || 0;
+        await this.loadFilterOptions();
+
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Keine Leads vorhanden</td></tr>';
+          this.updatePagination();
+          return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(lead => {
+          const row = this.createLeadRow(lead);
+          tbody.appendChild(row);
+        });
+
+        this.updatePagination();
+      } catch (err) {
+        console.error('❌ Error loading leads:', err);
+        tbody.innerHTML = '<tr><td colspan="9" class="error-cell">Fehler beim Laden der Daten</td></tr>';
       }
     },
 
-    toggleFilter(eventType) {
-      const filterEl = document.getElementById(`filter-${eventType}`);
-      if (!filterEl) return;
+    async loadFilterOptions() {
+      try {
+        const { data: sources } = await window.SupabaseClient
+          .from('leads')
+          .select('source')
+          .not('source', 'is', null)
+          .neq('source', '');
 
-      const isHidden = filterEl.classList.toggle('hidden');
+        const uniqueSources = [...new Set(sources?.map(s => s.source) || [])];
+        const sourceFilter = document.getElementById('sourceFilter');
+        if (sourceFilter) {
+          const currentValue = sourceFilter.value;
+          sourceFilter.innerHTML = '<option value="">Alle Traffic Sources</option>';
+          uniqueSources.forEach(source => {
+            const option = document.createElement('option');
+            option.value = source;
+            option.textContent = source;
+            sourceFilter.appendChild(option);
+          });
+          sourceFilter.value = currentValue;
+        }
 
-      if (!isHidden && filterEl.innerHTML.trim() === '') {
-        this.renderFilter(eventType);
+        const { data: countries } = await window.SupabaseClient
+          .from('leads')
+          .select('country')
+          .not('country', 'is', null)
+          .neq('country', '');
+
+        const uniqueCountries = [...new Set(countries?.map(c => c.country) || [])];
+        const countryFilter = document.getElementById('countryFilter');
+        if (countryFilter) {
+          const currentValue = countryFilter.value;
+          countryFilter.innerHTML = '<option value="">Alle Länder</option>';
+          uniqueCountries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+          });
+          countryFilter.value = currentValue;
+        }
+      } catch (err) {
+        console.error('❌ Error loading filter options:', err);
       }
     },
 
-    renderFilter(eventType) {
-      const filterEl = document.getElementById(`filter-${eventType}`);
-      if (!filterEl) return;
+    createLeadRow(lead) {
+      const tr = document.createElement('tr');
+      tr.dataset.leadId = lead.id;
+
+      const createdAt = new Date(lead.created_at).toLocaleDateString('de-DE');
+
+      tr.innerHTML = `
+        <td>${lead.name || '-'}</td>
+        <td>${lead.primary_email || '-'}</td>
+        <td>${lead.primary_phone || '-'}</td>
+        <td>${lead.source || '-'}</td>
+        <td>${lead.utm_campaign || '-'}</td>
+        <td>${lead.country || '-'}</td>
+        <td>${lead.funnel_id || '-'}</td>
+        <td>${createdAt}</td>
+        <td class="actions-cell">
+          <button class="btn-icon edit-btn" data-lead-id="${lead.id}" title="Bearbeiten">✏️</button>
+          <button class="btn-icon delete-btn" data-lead-id="${lead.id}" title="Löschen">🗑️</button>
+        </td>
+      `;
+
+      const editBtn = tr.querySelector('.edit-btn');
+      if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.openEditLeadModal(lead.id);
+        });
+      }
+
+      const deleteBtn = tr.querySelector('.delete-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteLead(lead.id);
+        });
+      }
+
+      tr.addEventListener('click', () => {
+        this.openLeadDetail(lead.id);
+      });
+
+      return tr;
+    },
+
+    updatePagination() {
+      const totalPages = Math.ceil(this.totalLeads / ITEMS_PER_PAGE);
+      const pageInfo = document.getElementById('pageInfo');
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+
+      if (pageInfo) {
+        pageInfo.textContent = `Seite ${this.currentPage} von ${totalPages || 1} (${this.totalLeads} Leads)`;
+      }
+
+      if (prevBtn) {
+        prevBtn.disabled = this.currentPage === 1;
+      }
+
+      if (nextBtn) {
+        nextBtn.disabled = this.currentPage >= totalPages;
+      }
+    },
+
+    openAddLeadModal() {
+      const modal = this.createLeadModal(null);
+      document.body.appendChild(modal);
+    },
+
+    async openEditLeadModal(leadId) {
+      try {
+        const { data: lead, error } = await window.SupabaseClient
+          .from('leads')
+          .select('*')
+          .eq('id', leadId)
+          .maybeSingle();
+
+        if (error || !lead) {
+          console.error('❌ Error loading lead:', error);
+          if (window.Toast) {
+            window.Toast.error('Lead nicht gefunden');
+          }
+          return;
+        }
+
+        const modal = this.createLeadModal(lead);
+        document.body.appendChild(modal);
+      } catch (err) {
+        console.error('❌ Error opening edit modal:', err);
+        if (window.Toast) {
+          window.Toast.error('Fehler beim Laden der Lead-Daten');
+        }
+      }
+    },
+
+    createLeadModal(lead) {
+      const isEdit = lead !== null;
+      const modal = document.createElement('div');
+      modal.id = 'leadModal';
+      modal.className = 'modal';
 
       const funnels = FunnelAPI.loadFunnels();
       const funnelOptions = funnels.map(f =>
-        `<option value="${f.id}">${f.name}</option>`
+        `<option value="${f.id}" ${lead && lead.funnel_id === f.id ? 'selected' : ''}>${f.name}</option>`
       ).join('');
 
-      filterEl.innerHTML = `
-        <div class="filter-grid">
-          <div class="filter-field">
-            <label>Von:</label>
-            <input type="date" id="filter-${eventType}-from" />
+      modal.innerHTML = `
+        <div class="modal-content lead-modal">
+          <div class="modal-header">
+            <h2>${isEdit ? 'Lead bearbeiten' : 'Neuer Lead'}</h2>
+            <button class="close-btn" onclick="document.getElementById('leadModal').remove()">×</button>
           </div>
-          <div class="filter-field">
-            <label>Bis:</label>
-            <input type="date" id="filter-${eventType}-to" />
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Name *</label>
+              <input type="text" id="leadName" value="${lead?.name || ''}" required />
+            </div>
+
+            <div class="form-group">
+              <label>E-Mail *</label>
+              <input type="email" id="leadEmail" value="${lead?.primary_email || ''}" required />
+            </div>
+
+            <div class="form-group">
+              <label>Telefon</label>
+              <input type="text" id="leadPhone" value="${lead?.primary_phone || ''}" />
+            </div>
+
+            <div class="form-group">
+              <label>Traffic Source</label>
+              <input type="text" id="leadSource" value="${lead?.source || ''}" />
+            </div>
+
+            <div class="form-group">
+              <label>UTM Campaign</label>
+              <input type="text" id="leadUtmCampaign" value="${lead?.utm_campaign || ''}" />
+            </div>
+
+            <div class="form-group">
+              <label>Land</label>
+              <input type="text" id="leadCountry" value="${lead?.country || ''}" />
+            </div>
+
+            <div class="form-group">
+              <label>Funnel</label>
+              <select id="leadFunnel">
+                <option value="">Kein Funnel</option>
+                ${funnelOptions}
+              </select>
+            </div>
           </div>
-          <div class="filter-field">
-            <label>Funnel:</label>
-            <select id="filter-${eventType}-funnel">
-              <option value="">Alle</option>
-              ${funnelOptions}
-            </select>
-          </div>
-          <div class="filter-field">
-            <label>Suche:</label>
-            <input type="text" id="filter-${eventType}-search" placeholder="Name, Email, Telefon..." />
-          </div>
-          <div class="filter-actions">
-            <button class="btn-small btn-primary" onclick="window.DataPool.applyFilter('${eventType}')">
-              Anwenden
+          <div class="modal-footer">
+            <button class="btn-secondary" onclick="document.getElementById('leadModal').remove()">
+              Abbrechen
             </button>
-            <button class="btn-small btn-secondary" onclick="window.DataPool.resetFilter('${eventType}')">
-              Zurücksetzen
+            <button class="btn-primary" id="saveLeadBtn">
+              ${isEdit ? 'Speichern' : 'Erstellen'}
             </button>
           </div>
         </div>
       `;
-    },
 
-    async applyFilter(eventType) {
-      const fromDate = document.getElementById(`filter-${eventType}-from`)?.value;
-      const toDate = document.getElementById(`filter-${eventType}-to`)?.value;
-      const funnelId = document.getElementById(`filter-${eventType}-funnel`)?.value;
-      const search = document.getElementById(`filter-${eventType}-search`)?.value;
-
-      this.currentFilters[eventType] = {
-        fromDate,
-        toDate,
-        funnelId,
-        search
-      };
-
-      await this.loadEvents(eventType);
-    },
-
-    async resetFilter(eventType) {
-      this.currentFilters[eventType] = {};
-
-      const filterEl = document.getElementById(`filter-${eventType}`);
-      if (filterEl) {
-        filterEl.querySelectorAll('input, select').forEach(el => {
-          if (el.type === 'text' || el.type === 'date') {
-            el.value = '';
-          } else if (el.tagName === 'SELECT') {
-            el.selectedIndex = 0;
+      const saveBtn = modal.querySelector('#saveLeadBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          if (isEdit) {
+            this.updateLead(lead.id);
+          } else {
+            this.createLead();
           }
         });
       }
 
-      await this.loadEvents(eventType);
+      return modal;
     },
 
-    async loadStats() {
-      try {
-        const { data: leads, error: leadsError } = await window.SupabaseClient
-          .from('leads')
-          .select('id', { count: 'exact', head: true });
+    async createLead() {
+      const name = document.getElementById('leadName')?.value.trim();
+      const email = document.getElementById('leadEmail')?.value.trim();
+      const phone = document.getElementById('leadPhone')?.value.trim();
+      const source = document.getElementById('leadSource')?.value.trim();
+      const utmCampaign = document.getElementById('leadUtmCampaign')?.value.trim();
+      const country = document.getElementById('leadCountry')?.value.trim();
+      const funnelId = document.getElementById('leadFunnel')?.value;
 
-        const today = new Date().toISOString().split('T')[0];
-        const { data: events, error: eventsError } = await window.SupabaseClient
-          .from('events')
-          .select('id', { count: 'exact', head: true })
-          .eq('event_date', today);
-
-        const { data: syncLog, error: syncError } = await window.SupabaseClient
-          .from('sync_log')
-          .select('completed_at')
-          .order('completed_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        document.getElementById('totalLeads').textContent = leadsError ? '-' : (leads?.length || 0);
-        document.getElementById('todayEvents').textContent = eventsError ? '-' : (events?.length || 0);
-
-        if (syncLog && syncLog.completed_at) {
-          const syncDate = new Date(syncLog.completed_at);
-          document.getElementById('lastSync').textContent = syncDate.toLocaleString('de-DE');
-        } else {
-          document.getElementById('lastSync').textContent = 'Nie';
+      if (!name || !email) {
+        if (window.Toast) {
+          window.Toast.error('Name und E-Mail sind erforderlich');
         }
-      } catch (err) {
-        console.error('❌ Error loading stats:', err);
-      }
-    },
-
-    async loadAllEvents() {
-      await this.loadEvents('leads');
-      await this.loadEvents('surveys');
-      await this.loadEvents('surveyQualis');
-      await this.loadEvents('bookings');
-      await this.loadEvents('units');
-    },
-
-    async loadEvents(eventType, offset = 0) {
-      const listEl = document.getElementById(`list-${eventType}`);
-      if (!listEl) return;
-
-      if (offset === 0) {
-        listEl.innerHTML = '<div class="loading-spinner">Laden...</div>';
+        return;
       }
 
       try {
-        const eventTypeMap = {
-          leads: 'lead',
-          surveys: 'survey',
-          surveyQualis: 'surveyQuali',
-          bookings: ['settingBooking', 'closingBooking'],
-          units: 'unit'
+        const leadData = {
+          name,
+          primary_email: email,
+          emails: [email],
+          primary_phone: phone || null,
+          phones: phone ? [phone] : [],
+          source: source || null,
+          utm_campaign: utmCampaign || '',
+          country: country || '',
+          funnel_id: funnelId || null,
+          metadata: {}
         };
 
-        const eventTypeFilter = eventTypeMap[eventType];
-        const filters = this.currentFilters[eventType] || {};
-
-        let query = window.SupabaseClient
-          .from('events')
-          .select(`
-            *,
-            lead:lead_id (
-              id,
-              name,
-              primary_email,
-              primary_phone,
-              emails,
-              phones,
-              source
-            )
-          `)
-          .order('event_date', { ascending: false })
-          .order('created_at', { ascending: false })
-          .range(offset, offset + ITEMS_PER_PAGE - 1);
-
-        if (Array.isArray(eventTypeFilter)) {
-          query = query.in('event_type', eventTypeFilter);
-        } else {
-          query = query.eq('event_type', eventTypeFilter);
-        }
-
-        if (filters.fromDate) {
-          query = query.gte('event_date', filters.fromDate);
-        }
-
-        if (filters.toDate) {
-          query = query.lte('event_date', filters.toDate);
-        }
-
-        if (filters.funnelId) {
-          query = query.eq('funnel_id', filters.funnelId);
-        }
-
-        const { data, error } = await query;
+        const { data, error } = await window.SupabaseClient
+          .from('leads')
+          .insert([leadData])
+          .select()
+          .single();
 
         if (error) {
-          console.error('❌ Error loading events:', error);
-          listEl.innerHTML = '<div class="error-message">Fehler beim Laden der Daten</div>';
-          return;
-        }
-
-        let filteredData = data || [];
-
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
-          filteredData = filteredData.filter(event => {
-            const lead = event.lead;
-            if (!lead) return false;
-
-            const nameMatch = lead.name?.toLowerCase().includes(searchLower);
-            const emailMatch = lead.primary_email?.toLowerCase().includes(searchLower);
-            const phoneMatch = lead.primary_phone?.includes(searchLower);
-
-            return nameMatch || emailMatch || phoneMatch;
-          });
-        }
-
-        if (offset === 0) {
-          listEl.innerHTML = '';
-        }
-
-        if (filteredData.length === 0 && offset === 0) {
-          listEl.innerHTML = '<div class="empty-message">Keine Daten vorhanden</div>';
-          return;
-        }
-
-        filteredData.forEach(event => {
-          const row = this.createEventRow(event, eventType);
-          listEl.appendChild(row);
-        });
-
-        const loadMoreBtn = document.querySelector(`.btn-load-more[data-event="${eventType}"]`);
-        if (loadMoreBtn) {
-          if (filteredData.length === ITEMS_PER_PAGE) {
-            loadMoreBtn.classList.remove('hidden');
-          } else {
-            loadMoreBtn.classList.add('hidden');
+          console.error('❌ Error creating lead:', error);
+          if (window.Toast) {
+            window.Toast.error('Fehler beim Erstellen des Leads');
           }
+          return;
         }
+
+        if (window.Toast) {
+          window.Toast.success('Lead erfolgreich erstellt');
+        }
+
+        document.getElementById('leadModal')?.remove();
+        await this.loadLeads();
       } catch (err) {
-        console.error('❌ Error loading events:', err);
-        listEl.innerHTML = '<div class="error-message">Fehler beim Laden der Daten</div>';
+        console.error('❌ Error creating lead:', err);
+        if (window.Toast) {
+          window.Toast.error('Fehler beim Erstellen des Leads');
+        }
       }
     },
 
-    createEventRow(event, eventType) {
-      const row = document.createElement('div');
-      row.className = 'event-row';
-      row.dataset.leadId = event.lead_id;
-      row.dataset.eventId = event.id;
+    async updateLead(leadId) {
+      const name = document.getElementById('leadName')?.value.trim();
+      const email = document.getElementById('leadEmail')?.value.trim();
+      const phone = document.getElementById('leadPhone')?.value.trim();
+      const source = document.getElementById('leadSource')?.value.trim();
+      const utmCampaign = document.getElementById('leadUtmCampaign')?.value.trim();
+      const country = document.getElementById('leadCountry')?.value.trim();
+      const funnelId = document.getElementById('leadFunnel')?.value;
 
-      const lead = event.lead || {};
-      const name = lead.name || '-';
-      const email = lead.primary_email || '-';
-      const phone = lead.primary_phone || '-';
-      const source = event.source || lead.source || '-';
-      const date = new Date(event.event_date).toLocaleDateString('de-DE');
-      const time = new Date(event.created_at).toLocaleTimeString('de-DE', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      if (eventType === 'units') {
-        row.innerHTML = `
-          <div class="event-cell">${name}</div>
-          <div class="event-cell">${email}</div>
-          <div class="event-cell">${phone}</div>
-          <div class="event-cell">${source}</div>
-          <div class="event-cell">${date} ${time}</div>
-          <div class="event-cell">${(event.revenue || 0).toFixed(2)} €</div>
-          <div class="event-cell">${(event.cash || 0).toFixed(2)} €</div>
-        `;
-      } else {
-        row.innerHTML = `
-          <div class="event-cell">${name}</div>
-          <div class="event-cell">${email}</div>
-          <div class="event-cell">${phone}</div>
-          <div class="event-cell">${source}</div>
-          <div class="event-cell">${date} ${time}</div>
-        `;
+      if (!name || !email) {
+        if (window.Toast) {
+          window.Toast.error('Name und E-Mail sind erforderlich');
+        }
+        return;
       }
 
-      row.addEventListener('click', () => {
-        this.openLeadDetail(event.lead_id);
-      });
+      try {
+        const { data: currentLead } = await window.SupabaseClient
+          .from('leads')
+          .select('emails, phones')
+          .eq('id', leadId)
+          .maybeSingle();
 
-      return row;
+        let emails = currentLead?.emails || [];
+        if (!emails.includes(email)) {
+          emails = [email, ...emails];
+        }
+
+        let phones = currentLead?.phones || [];
+        if (phone && !phones.includes(phone)) {
+          phones = [phone, ...phones];
+        }
+
+        const leadData = {
+          name,
+          primary_email: email,
+          emails,
+          primary_phone: phone || null,
+          phones,
+          source: source || null,
+          utm_campaign: utmCampaign || '',
+          country: country || '',
+          funnel_id: funnelId || null
+        };
+
+        const { error } = await window.SupabaseClient
+          .from('leads')
+          .update(leadData)
+          .eq('id', leadId);
+
+        if (error) {
+          console.error('❌ Error updating lead:', error);
+          if (window.Toast) {
+            window.Toast.error('Fehler beim Aktualisieren des Leads');
+          }
+          return;
+        }
+
+        if (window.Toast) {
+          window.Toast.success('Lead erfolgreich aktualisiert');
+        }
+
+        document.getElementById('leadModal')?.remove();
+        await this.loadLeads();
+      } catch (err) {
+        console.error('❌ Error updating lead:', err);
+        if (window.Toast) {
+          window.Toast.error('Fehler beim Aktualisieren des Leads');
+        }
+      }
     },
 
-    loadMore(eventType) {
-      const listEl = document.getElementById(`list-${eventType}`);
-      if (!listEl) return;
+    async deleteLead(leadId) {
+      if (!confirm('Möchten Sie diesen Lead wirklich löschen? Dies wird auch alle zugehörigen Events löschen.')) {
+        return;
+      }
 
-      const currentRows = listEl.querySelectorAll('.event-row').length;
-      this.loadEvents(eventType, currentRows);
+      try {
+        const { error } = await window.SupabaseClient
+          .from('leads')
+          .delete()
+          .eq('id', leadId);
+
+        if (error) {
+          console.error('❌ Error deleting lead:', error);
+          if (window.Toast) {
+            window.Toast.error('Fehler beim Löschen des Leads');
+          }
+          return;
+        }
+
+        if (window.Toast) {
+          window.Toast.success('Lead erfolgreich gelöscht');
+        }
+
+        await this.loadLeads();
+      } catch (err) {
+        console.error('❌ Error deleting lead:', err);
+        if (window.Toast) {
+          window.Toast.error('Fehler beim Löschen des Leads');
+        }
+      }
     },
 
     async openLeadDetail(leadId) {
-      console.log('📄 Opening lead detail:', leadId);
-
       try {
         const { data: lead, error: leadError } = await window.SupabaseClient
           .from('leads')
@@ -489,16 +750,25 @@
           </div>
           <div class="lead-detail-info">
             <div class="info-group">
-              <strong>Email(s):</strong> ${this.formatEmails(lead.emails, lead.primary_email)}
+              <strong>E-Mail:</strong> ${lead.primary_email || '-'}
             </div>
             <div class="info-group">
-              <strong>Telefon:</strong> ${this.formatPhones(lead.phones, lead.primary_phone)}
+              <strong>Telefon:</strong> ${lead.primary_phone || '-'}
             </div>
             <div class="info-group">
-              <strong>Quelle:</strong> ${lead.source || '-'}
+              <strong>Traffic Source:</strong> ${lead.source || '-'}
+            </div>
+            <div class="info-group">
+              <strong>UTM Campaign:</strong> ${lead.utm_campaign || '-'}
+            </div>
+            <div class="info-group">
+              <strong>Land:</strong> ${lead.country || '-'}
             </div>
             <div class="info-group">
               <strong>Funnel:</strong> ${lead.funnel_id || '-'}
+            </div>
+            <div class="info-group">
+              <strong>Erstellt am:</strong> ${new Date(lead.created_at).toLocaleString('de-DE')}
             </div>
           </div>
           <div class="lead-timeline">
@@ -509,20 +779,6 @@
       `;
 
       document.body.appendChild(modal);
-    },
-
-    formatEmails(emails, primaryEmail) {
-      if (!emails || emails.length === 0) return primaryEmail || '-';
-      return emails.map(email =>
-        email === primaryEmail ? `<strong>${email}</strong>` : email
-      ).join(', ');
-    },
-
-    formatPhones(phones, primaryPhone) {
-      if (!phones || phones.length === 0) return primaryPhone || '-';
-      return phones.map(phone =>
-        phone === primaryPhone ? `<strong>${phone}</strong>` : phone
-      ).join(', ');
     },
 
     renderTimeline(events) {
@@ -575,26 +831,6 @@
           window.Toast.error('CSV Import nicht verfügbar');
         }
       }
-    },
-
-    openSettings() {
-      if (window.APISettings) {
-        window.APISettings.openModal();
-      } else {
-        console.error('❌ API Settings module not loaded');
-        if (window.Toast) {
-          window.Toast.error('Einstellungen nicht verfügbar');
-        }
-      }
-    },
-
-    async syncNow() {
-      console.log('🔄 Starting sync...');
-      if (window.Toast) {
-        window.Toast.info('Synchronisation gestartet...');
-      }
-      await this.loadStats();
-      await this.loadAllEvents();
     }
   };
 
