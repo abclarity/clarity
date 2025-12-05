@@ -395,7 +395,7 @@
 
   // 3️⃣ Qualification
   if (wizardState.surveyQuali === 'yes') {
-    parts.push('Quali');
+    parts.push('QualiSurvey');
   }
 
   // 4️⃣ Close Type
